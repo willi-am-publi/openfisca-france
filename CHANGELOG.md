@@ -16,7 +16,7 @@
 * Périodes concernées : toutes.
 * Zones impactées : `/mesures`.
 * Détails :
-  - Corrige le calcul de `uc` (Unités de consommation d'un ménage)
+  - Corrige le calcul de `unites_consommation` (Unités de consommation d'un ménage)
   - Introduit la variable `revenu_primaire`
 
 <!-- -->
