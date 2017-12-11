@@ -8,6 +8,7 @@
   - Change la valeur par défaut de `rsa_condition_nationalite` à `True`
   - Change la valeur par défaut de `nombre_jours_calendaires` à `30`
   - Change la péride de définition de `retraite_imposable`: cette variable est désormais mensuelle.
+  - Renomme `uc` en `unites_consommation`
 
 <!-- -->
 
