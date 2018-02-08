@@ -121,7 +121,7 @@ class valeur_locative_loue(Variable):
     value_type = float
     entity = Individu
     base_function = requested_period_last_value
-    label = u"Valeur locative des biens immobiliers loués"
+    label = u"Valeur locative des biens immobiliers et des terrains loués"
     definition_period = MONTH
 
 
