@@ -15,7 +15,7 @@ class unites_consommation(Variable):
 
     def formula(menage, period, parameters):
         age_indiv = menage.members('age', period.first_month)
-        uc_indiv = 0.5 * (age_i >= 14) + 0.3 * (age < 14)
+        uc_indiv = 0.5 * (age_indiv >= 14) + 0.3 * (age_indiv < 14)
         tot_uc_indiv = menage.sum(uc_indiv)
 
         return 0.5 + tot_uc_indiv
@@ -190,7 +190,7 @@ class revenus_du_travail(Variable):
 
     def formula(individu, period):
         salaire_net = individu('salaire_net', period, options = [ADD])
-        revenus_non_salaries = individu('rpns', period, options = [ADD])  # TODO ou rpns_individu
+        revenus_non_salaries = individu('rpns', period, options = [ADD])  # TODO ou rpns_individu
 
         return salaire_net + revenus_non_salaries
 
