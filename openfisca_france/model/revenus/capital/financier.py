@@ -242,7 +242,7 @@ class epargne_revenus_non_imposables(Variable):
     value_type = float
     entity = Individu
     base_function = requested_period_last_value
-    label = u"Épargne générant des revenus non imposables"
+    label = u"Épargne générant des revenus non imposables hors Livret A"
     definition_period = MONTH
 
 

@@ -3,7 +3,7 @@
 # 21.0.0 [#902](https://github.com/openfisca/openfisca-france/pull/902)
 
 * Évolution du système socio-fiscal.
-* Périodes concernées : à partir du 1er octobre 2016.
+* Périodes concernées : à partir de juin 2009.
 * Détails :
   - Mise à jour de la prise en compte du patrimoine dans la base ressource du RSA
     + Suppression de `interets_epargne_sur_livrets` et `epargne_non_remuneree`
