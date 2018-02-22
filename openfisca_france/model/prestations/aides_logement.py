@@ -21,6 +21,30 @@ log = logging.getLogger(__name__)
 zone_apl_by_depcom = None
 
 
+class taux_effort_logement(Variable):
+    value_type = float
+    entity = Famille
+    definition_period = MONTH
+
+    def formula(famille, period, parameters):
+        loyer = famille.demandeur.menage('loyer', period)
+        salaire_net = famille.sum(famille.members('salaire_net', period))
+        al = famille('aide_logement', period)
+        return (loyer - al) / (salaire_net + 1)
+
+
+class proportion_ressource_logement(Variable):
+    value_type = float
+    entity = Famille
+    definition_period = MONTH
+
+    def formula(famille, period, parameters):
+        loyer = famille.demandeur.menage('loyer', period)
+        salaire_net = famille.sum(famille.members('salaire_net', period))
+        al = famille('aide_logement', period)
+        return loyer / (salaire_net + al)
+
+
 class al_nb_personnes_a_charge(Variable):
     value_type = int
     entity = Famille
@@ -299,7 +323,7 @@ class aide_logement_base_ressources_defaut(Variable):
         return result
 
 
-class aide_logement_base_ressources(Variable):
+class aide_logement_base_ressources_initiale(Variable):
     value_type = float
     entity = Famille
     label = u"Base ressources des allocations logement"
@@ -347,11 +371,21 @@ class aide_logement_base_ressources(Variable):
         montant_plancher_ressources = max_(0, demandeur_etudiant * Pr.dar_4 - demandeur_boursier * Pr.dar_5)
         ressources = max_(ressources, montant_plancher_ressources)
 
-        # Arrondi au centime, pour éviter qu'une petite imprécision liée à la recombinaison d'une valeur annuelle éclatée ne fasse monter d'un cran l'arrondi au 100€ supérieur.
+        return ressources
+
+
+class aide_logement_base_ressources(Variable):
+    value_type = float
+    entity = Famille
+    label = u"Base ressources des allocations logement"
+    definition_period = MONTH
+
+    def formula(famille, period, parameters):
+        ressources = famille('aide_logement_base_ressources_initiale', period)
 
         ressources = round_(ressources * 100) / 100
 
-        # Arrondi aux 100 euros supérieurs
+        # Arrondi aux 100 euros supérieurs cf. législation
         ressources = ceil(ressources / 100) * 100
 
         return ressources

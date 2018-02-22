@@ -9,6 +9,18 @@ from openfisca_france.model.base import *  # noqa analysis:ignore
 from openfisca_france.model.prestations.prestations_familiales.base_ressource import nb_enf
 
 
+class rsa_base_ressources_statique(Variable):
+    value_type = float
+    label = u"Base ressources statique du Rmi ou du Rsa"
+    entity = Famille
+    definition_period = MONTH
+
+    def formula(famille, period, parameters):
+        mois_courant = period
+        v = famille('rsa_base_ressources', period, extra_params  = [mois_courant])
+        return v * 1
+
+
 class rsa_base_ressources(Variable):
     value_type = float
     label = u"Base ressources du Rmi ou du Rsa"
