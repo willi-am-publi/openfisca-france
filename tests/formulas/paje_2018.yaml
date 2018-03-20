@@ -1,0 +1,415 @@
+- name: "PAJE - PAB - Cas N°1"
+  description: Montant PAJE
+  period: 2018-03
+  absolute_error_margin: 0.02
+  familles:
+    parents: ["parent1", "parent2"]
+    enfants: ["enfant1"]
+  foyers_fiscaux:
+    declarants: ["parent1", "parent2"]
+    personnes_a_charge: ["enfant1"]
+  menages:
+    personne_de_reference: "parent1"
+    conjoint: "parent2"
+    enfants: ["enfant1"]
+  individus:
+    - id: "parent1"
+      age: 38
+      prestations_familiales_base_ressources_individu: 10000
+    - id: "parent2"
+      age: 35
+      prestations_familiales_base_ressources_individu: 5000
+    - id: "enfant1"
+      age: 1
+  output_variables:
+    paje: 184.62 / (1 - 0.005)
+    
+- name: "PAJE - PAB - Cas N°2"
+  description: Montant PAJE
+  period: 2018-03
+  absolute_error_margin: 0.02
+  familles:
+    parents: ["parent1", "parent2"]
+    enfants: ["enfant1", "enfant2"]
+  foyers_fiscaux:
+    declarants: ["parent1", "parent2"]
+    personnes_a_charge: ["enfant1", "enfant2"]
+  menages:
+    personne_de_reference: "parent1"
+    conjoint: "parent2"
+    enfants: ["enfant1", "enfant2"]
+  individus:
+    - id: "parent1"
+      age: 38
+      prestations_familiales_base_ressources_individu: 10000
+    - id: "parent2"
+      age: 35
+      prestations_familiales_base_ressources_individu: 5000
+    - id: "enfant1"
+      age: 3
+    - id: "enfant2"
+      age: 1
+  output_variables:
+    paje: 184.62 / (1 - 0.005)
+    
+- name: "PAJE - PAB - Cas N°3"
+  description: Montant PAJE
+  period: 2018-03
+  absolute_error_margin: 0.02
+  familles:
+    parents: ["parent1", "parent2"]
+    enfants: ["enfant1", "enfant2", "enfant3"]
+  foyers_fiscaux:
+    declarants: ["parent1", "parent2"]
+    personnes_a_charge: ["enfant1", "enfant2", "enfant3"]
+  menages:
+    personne_de_reference: "parent1"
+    conjoint: "parent2"
+    enfants: ["enfant1", "enfant2", "enfant3"]
+  individus:
+    - id: "parent1"
+      age: 38
+      prestations_familiales_base_ressources_individu: 10000
+    - id: "parent2"
+      age: 35
+      prestations_familiales_base_ressources_individu: 5000
+    - id: "enfant1"
+      age: 6
+    - id: "enfant2"
+      age: 3
+    - id: "enfant3"
+      age: 1
+  output_variables:
+    paje: 184.62 / (1 - 0.005)
+    
+- name: "PAJE - PAB - Cas N°4"
+  description: Montant PAJE
+  period: 2018-03
+  absolute_error_margin: 0.02
+  familles:
+    parents: ["parent1", "parent2"]
+    enfants: ["enfant1"]
+  foyers_fiscaux:
+    declarants: ["parent1", "parent2"]
+    personnes_a_charge: ["enfant1"]
+  menages:
+    personne_de_reference: "parent1"
+    conjoint: "parent2"
+    enfants: ["enfant1"]
+  individus:
+    - id: "parent1"
+      age: 38
+      prestations_familiales_base_ressources_individu: 29000
+    - id: "parent2"
+      age: 35
+      prestations_familiales_base_ressources_individu: 10000
+    - id: "enfant1"
+      age: 1
+  output_variables:
+    paje: 92.31 / (1 - 0.005)
+    
+- name: "PAJE - PAB - Cas N°5"
+  description: Montant PAJE
+  period: 2018-03
+  absolute_error_margin: 0.02
+  familles:
+    parents: ["parent1", "parent2"]
+    enfants: ["enfant1", "enfant2"]
+  foyers_fiscaux:
+    declarants: ["parent1", "parent2"]
+    personnes_a_charge: ["enfant1", "enfant2"]
+  menages:
+    personne_de_reference: "parent1"
+    conjoint: "parent2"
+    enfants: ["enfant1", "enfant2"]
+  individus:
+    - id: "parent1"
+      age: 38
+      prestations_familiales_base_ressources_individu: 28000
+    - id: "parent2"
+      age: 35
+      prestations_familiales_base_ressources_individu: 10000
+    - id: "enfant1"
+      age: 3
+    - id: "enfant2"
+      age: 1
+  output_variables:
+    paje: 92.31 / (1 - 0.005)
+    
+- name: "PAJE - PAB - Cas N°6"
+  description: Montant PAJE
+  period: 2018-03
+  absolute_error_margin: 0.02
+  familles:
+    parents: ["parent1", "parent2"]
+    enfants: ["enfant1", "enfant2", "enfant3"]
+  foyers_fiscaux:
+    declarants: ["parent1", "parent2"]
+    personnes_a_charge: ["enfant1", "enfant2", "enfant3"]
+  menages:
+    personne_de_reference: "parent1"
+    conjoint: "parent2"
+    enfants: ["enfant1", "enfant2", "enfant3"]
+  individus:
+    - id: "parent1"
+      age: 38
+      prestations_familiales_base_ressources_individu: 28000
+    - id: "parent2"
+      age: 35
+      prestations_familiales_base_ressources_individu: 10000
+    - id: "enfant1"
+      age: 6
+    - id: "enfant2"
+      age: 3
+    - id: "enfant3"
+      age: 1
+  output_variables:
+    paje: 92.31 / (1 - 0.005)
+    
+- name: "PAJE - PAB Non Passant - Cas N°1"
+  description: Montant PAJE
+  period: 2018-03
+  absolute_error_margin: 0.02
+  familles:
+    parents: ["parent1", "parent2"]
+    enfants: ["enfant1"]
+  foyers_fiscaux:
+    declarants: ["parent1", "parent2"]
+    personnes_a_charge: ["enfant1"]
+  menages:
+    personne_de_reference: "parent1"
+    conjoint: "parent2"
+    enfants: ["enfant1"]
+  individus:
+    - id: "parent1"
+      age: 38
+      prestations_familiales_base_ressources_individu: 30000
+    - id: "parent2"
+      age: 35
+      prestations_familiales_base_ressources_individu: 25000
+    - id: "enfant1"
+      age: 1
+  output_variables:
+    paje: 0
+ 
+- name: "PAJE - PAB Non Passant - Cas N°2"
+  description: Montant PAJE
+  period: 2018-03
+  absolute_error_margin: 0.02
+  familles:
+    parents: ["parent1", "parent2"]
+    enfants: ["enfant1", "enfant2"]
+  foyers_fiscaux:
+    declarants: ["parent1", "parent2"]
+    personnes_a_charge: ["enfant1", "enfant2"]
+  menages:
+    personne_de_reference: "parent1"
+    conjoint: "parent2"
+    enfants: ["enfant1", "enfant2"]
+  individus:
+    - id: "parent1"
+      age: 38
+      prestations_familiales_base_ressources_individu: 35000
+    - id: "parent2"
+      age: 35
+      prestations_familiales_base_ressources_individu: 30000
+    - id: "enfant1"
+      age: 3
+    - id: "enfant2"
+      age: 1
+  output_variables:
+    paje: 0
+    
+- name: "PAJE - PAB Non Passant - Cas N°3"
+  description: Montant PAJE
+  period: 2018-03
+  absolute_error_margin: 0.02
+  familles:
+    parents: ["parent1", "parent2"]
+    enfants: ["enfant1", "enfant2", "enfant3"]
+  foyers_fiscaux:
+    declarants: ["parent1", "parent2"]
+    personnes_a_charge: ["enfant1", "enfant2", "enfant3"]
+  menages:
+    personne_de_reference: "parent1"
+    conjoint: "parent2"
+    enfants: ["enfant1", "enfant2", "enfant3"]
+  individus:
+    - id: "parent1"
+      age: 38
+      prestations_familiales_base_ressources_individu: 30000
+    - id: "parent2"
+      age: 35
+      prestations_familiales_base_ressources_individu: 40000
+    - id: "enfant1"
+      age: 6
+    - id: "enfant2"
+      age: 3
+    - id: "enfant3"
+      age: 1
+  output_variables:
+    paje: 0
+    
+- name: "PAJE - PAB Non Passant - Cas N°4"
+  description: Montant PAJE
+  period: 2018-03
+  absolute_error_margin: 0.02
+  familles:
+    parents: ["parent1", "parent2"]
+    enfants: ["enfant1"]
+  foyers_fiscaux:
+    declarants: ["parent1", "parent2"]
+    personnes_a_charge: ["enfant1"]
+  menages:
+    personne_de_reference: "parent1"
+    conjoint: "parent2"
+    enfants: ["enfant1"]
+  individus:
+    - id: "parent1"
+      age: 38
+      prestations_familiales_base_ressources_individu: 10000
+    - id: "parent2"
+      age: 35
+      prestations_familiales_base_ressources_individu: 5000
+    - id: "enfant1"
+      age: 4
+  output_variables:
+    paje: 0
+
+- name: "PAJE - PPN - Cas N°1"
+  description: Montant PAJE
+  period: 2018-03
+  absolute_error_margin: 0.02
+  familles:
+    parents: ["parent1", "parent2"]
+    enfants: ["enfant1"]
+  foyers_fiscaux:
+    declarants: ["parent1", "parent2"]
+    personnes_a_charge: ["enfant1"]
+  menages:
+    personne_de_reference: "parent1"
+    conjoint: "parent2"
+    enfants: ["enfant1"]
+  individus:
+    - id: "parent1"
+      age: 38
+      prestations_familiales_base_ressources_individu: 28000
+    - id: "parent2"
+      age: 35
+      prestations_familiales_base_ressources_individu: 15000
+    - id: "enfant1"
+      date_naissance: 2018-01-01
+  output_variables:
+    paje: 923.08 / (1 - 0.005)
+    
+- name: "PAJE - PPN - Cas N°2"
+  description: Montant PAJE
+  period: 2018-03
+  absolute_error_margin: 0.02
+  familles:
+    parents: ["parent1", "parent2"]
+    enfants: ["enfant1", "enfant2"]
+  foyers_fiscaux:
+    declarants: ["parent1", "parent2"]
+    personnes_a_charge: ["enfant1", "enfant2"]
+  menages:
+    personne_de_reference: "parent1"
+    conjoint: "parent2"
+    enfants: ["enfant1", "enfant2"]
+  individus:
+    - id: "parent1"
+      age: 38
+      prestations_familiales_base_ressources_individu: 28000
+    - id: "parent2"
+      age: 35
+      prestations_familiales_base_ressources_individu: 15000
+    - id: "enfant1"
+      date_naissance: 2018-01-01
+    - id: "enfant2"
+      date_naissance: 2018-01-01
+  output_variables:
+    paje: 1846.16 / (1 - 0.005)
+    
+- name: "PAJE - PPN - Cas N°3"
+  description: Montant PAJE
+  period: 2018-03
+  absolute_error_margin: 0.02
+  familles:
+    parents: ["parent1", "parent2"]
+    enfants: ["enfant1", "enfant2", "enfant3"]
+  foyers_fiscaux:
+    declarants: ["parent1", "parent2"]
+    personnes_a_charge: ["enfant1", "enfant2", "enfant3"]
+  menages:
+    personne_de_reference: "parent1"
+    conjoint: "parent2"
+    enfants: ["enfant1", "enfant2", "enfant3"]
+  individus:
+    - id: "parent1"
+      age: 38
+      prestations_familiales_base_ressources_individu: 28000
+    - id: "parent2"
+      age: 35
+      prestations_familiales_base_ressources_individu: 15000
+    - id: "enfant1"
+      date_naissance: 2018-01-01
+    - id: "enfant2"
+      date_naissance: 2018-01-01
+    - id: "enfant3"
+      date_naissance: 2018-01-01
+  output_variables:
+    paje: 2769.24 / (1 - 0.005)
+     
+- name: "PAJE - PPN Non Passant - Cas N°1"
+  description: Montant PAJE
+  period: 2018-03
+  absolute_error_margin: 0.02
+  familles:
+    parents: ["parent1", "parent2"]
+    enfants: ["enfant1"]
+  foyers_fiscaux:
+    declarants: ["parent1", "parent2"]
+    personnes_a_charge: ["enfant1"]
+  menages:
+    personne_de_reference: "parent1"
+    conjoint: "parent2"
+    enfants: ["enfant1"]
+  individus:
+    - id: "parent1"
+      age: 38
+      prestations_familiales_base_ressources_individu: 35000
+    - id: "parent2"
+      age: 35
+      prestations_familiales_base_ressources_individu: 20000
+    - id: "enfant1"
+      date_naissance: 2018-01-01
+  output_variables:
+    paje: 0
+ 
+- name: "PAJE - PPN Non Passant - Cas N°2"
+  description: Montant PAJE
+  period: 2018-03
+  absolute_error_margin: 0.02
+  familles:
+    parents: ["parent1", "parent2"]
+    enfants: ["enfant1", "enfant2"]
+  foyers_fiscaux:
+    declarants: ["parent1", "parent2"]
+    personnes_a_charge: ["enfant1", "enfant2"]
+  menages:
+    personne_de_reference: "parent1"
+    conjoint: "parent2"
+    enfants: ["enfant1", "enfant2"]
+  individus:
+    - id: "parent1"
+      age: 38
+      prestations_familiales_base_ressources_individu: 25000
+    - id: "parent2"
+      age: 35
+      prestations_familiales_base_ressources_individu: 35000
+    - id: "enfant1"
+      age: 1
+    - id: "enfant2"
+      date_naissance: 2018-01-01
+  output_variables:
+    paje: 0
