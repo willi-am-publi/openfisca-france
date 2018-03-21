@@ -88,8 +88,6 @@ def transform_ipp_tree(root):
     """
     root est la racine de l'arbre construit depuis les fichiers XLSX de l'IPP.
     """
-    del root['baremes_ipp_tarification_energie_logement']
-    del root['baremes_ipp_chomage_unemployment']
     # root['chomage'] = root.pop('baremes_ipp_chomage_unemployment')
 
     root['impot_revenu'] = impot_revenu = root.pop('baremes_ipp_impot_revenu_income_tax')
@@ -274,7 +272,6 @@ def transform_ipp_tree(root):
     reductions_impots['prcomp'].update(prcomp.pop('prestations_compensatoires'))
     prcomp['seuil'] = prcomp.pop('plafond')
 
-    del root['baremes_ipp_marche_du_travail_labour_market']
     # root['marche_du_travail'] = root.pop('baremes_ipp_marche_du_travail_labour_market')
 
     root['prelevements_sociaux'] = prelevements_sociaux = root.pop(
