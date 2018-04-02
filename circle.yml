@@ -11,7 +11,7 @@ dependencies:
     - pip install twine
     # Uncomment and adapt the next line to use a particular feature branch of OpenFisca-Core to run Circle CI tests
     - pip install --editable git+https://github.com/openfisca/openfisca-core.git@michelbl-numpy-version#egg=OpenFisca-Core
-    - pip install 'numpy >= 1.14'
+    - pip install 'numpy >= 1.13, < 1.14'
     - pip install ".[test, api]" --upgrade
 test:
   pre:
