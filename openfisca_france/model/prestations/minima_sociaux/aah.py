@@ -65,27 +65,32 @@ class aah_base_ressources_eval_trimestrielle(Variable):
         ressources à partir de votre revenu mensuel.
     '''
 
-    def formula(individu, period, parameters):
+    def formula(individu, period):
+        period = period.first_month
         three_previous_months = period.start.period('month', 3).offset(-3)
         last_year = period.last_year
 
-        salaire_net = individu('salaire_net', three_previous_months, options = [ADD])
-        chomage_net = individu('chomage_net', three_previous_months, options = [ADD])
-        retraite_nette = individu('retraite_nette', three_previous_months, options = [ADD])
-        pensions_alimentaires_percues = individu('pensions_alimentaires_percues', three_previous_months, options = [ADD])
-        pensions_alimentaires_versees_individu = individu(
-            'pensions_alimentaires_versees_individu', three_previous_months, options = [ADD])
-        rsa_base_ressources_patrimoine_i = individu('rsa_base_ressources_patrimoine_individu', three_previous_months, options = [ADD])
-        indemnites_journalieres_imposables = individu('indemnites_journalieres_imposables', three_previous_months, options = [ADD])
-        indemnites_stage = individu('indemnites_stage', three_previous_months, options = [ADD])
-        revenus_stage_formation_pro = individu('revenus_stage_formation_pro', three_previous_months, options = [ADD])
-        allocation_securisation_professionnelle = individu(
-            'allocation_securisation_professionnelle', three_previous_months, options = [ADD])
-        prestation_compensatoire = individu('prestation_compensatoire', three_previous_months, options = [ADD])
-        pensions_invalidite = individu('pensions_invalidite', three_previous_months, options = [ADD])
-        indemnites_chomage_partiel = individu('indemnites_chomage_partiel', three_previous_months, options = [ADD])
-        bourse_recherche = individu('bourse_recherche', three_previous_months, options = [ADD])
-        gains_exceptionnels = individu('gains_exceptionnels', three_previous_months, options = [ADD])
+        ressources_a_inclure = [
+            'allocation_securisation_professionnelle',
+            'bourse_recherche',
+            'chomage_net',
+            'gains_exceptionnels',
+            'indemnites_chomage_partiel',
+            'indemnites_journalieres_imposables',
+            'indemnites_stage',
+            'pensions_alimentaires_percues',
+            'pensions_alimentaires_versees_individu',
+            'pensions_invalidite',
+            'prestation_compensatoire',
+            'retraite_nette',
+            'revenus_stage_formation_pro',
+            'rsa_base_ressources_patrimoine_individu',
+            'salaire_net',
+            ]
+
+        ressources = sum(
+            [individu(ressource, three_previous_months, options = [ADD]) for ressource in ressources_a_inclure]
+            )
 
         def revenus_tns():
             revenus_auto_entrepreneur = individu('tns_auto_entrepreneur_benefice', three_previous_months, options = [ADD])
@@ -97,16 +102,7 @@ class aah_base_ressources_eval_trimestrielle(Variable):
 
             return revenus_auto_entrepreneur + tns_micro_entreprise_benefice + tns_benefice_exploitant_agricole + tns_autres_revenus
 
-        result = (
-            salaire_net + indemnites_chomage_partiel + indemnites_stage + chomage_net + retraite_nette +
-            pensions_alimentaires_percues - abs_(pensions_alimentaires_versees_individu) +
-            rsa_base_ressources_patrimoine_i + allocation_securisation_professionnelle +
-            indemnites_journalieres_imposables + prestation_compensatoire +
-            pensions_invalidite + bourse_recherche + gains_exceptionnels + revenus_tns() +
-            revenus_stage_formation_pro
-        )
-
-        return result * 4
+        return (ressources + revenus_tns()) * 4
 
 
 class aah_base_ressources_eval_annuelle(Variable):
