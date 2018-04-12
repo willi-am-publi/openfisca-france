@@ -5,7 +5,6 @@ from numpy import absolute as abs_
 
 from openfisca_france.model.base import *  # noqa analysis:ignore
 
-# TODO : Aujourd'hui, cette BR correspond uniquement au demandeur, pas au conjoint.
 class aah_base_ressources(Variable):
     value_type = float
     label = u"Base ressources de l'allocation adulte handicapé"
@@ -181,13 +180,9 @@ class aah_non_calculable(Variable):
     definition_period = MONTH
 
     def formula(individu, period):
-        taux_incapacite = individu('taux_incapacite', period)
-        aah_eligible = individu('aah_eligible', period)
-
         # Pour le moment résultat "pas assez fiable, donc on renvoit une non calculabilité tout le temps.
-
         return where(
-            aah_eligible,
+            individu('aah_eligible', period),
             TypesAAHNonCalculable.intervention_CDAPH_necessaire,
             TypesAAHNonCalculable.calculable
         )
