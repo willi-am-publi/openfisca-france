@@ -1,5 +1,11 @@
 # Changelog
 
+## 21.9.0 [#969](https://github.com/openfisca/openfisca-france/pull/969)
+
+* Amélioration technique
+* Détails :
+  - Adapte Core v23
+
 ### 21.8.1 [#960](https://github.com/openfisca/openfisca-france/pull/960)
 
 * Évolution du système socio-fiscal.
