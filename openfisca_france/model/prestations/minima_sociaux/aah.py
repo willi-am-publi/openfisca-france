@@ -188,11 +188,25 @@ class aah_non_calculable(Variable):
         )
 
 
+class aah_base_non_cumulable(Variable):
+    value_type = float
+    label = u"Montant de l'Allocation adulte handicapé (hors complément) pour un individu, mensualisée"
+    entity = Individu
+    definition_period = MONTH
+
+    def formula(individu, period):
+        return individu('pensions_invalidite', period)
+
+
 class aah_base(Variable):
     calculate_output = calculate_output_add
     value_type = float
     label = u"Montant de l'Allocation adulte handicapé (hors complément) pour un individu, mensualisée"
     entity = Individu
+    reference = [
+        u"Article L821-1 du Code de la sécurité sociale",
+        u"https://www.legifrance.gouv.fr/affichCodeArticle.do;jsessionid=53AFF5AA4010B01F0539052A33180B39.tplgfr35s_1?idArticle=LEGIARTI000033813790&cidTexte=LEGITEXT000006073189&dateTexte=20180412"
+    ]
     definition_period = MONTH
 
     def formula(individu, period, parameters):
@@ -205,11 +219,11 @@ class aah_base(Variable):
         af_nbenf = individu.famille('af_nbenf', period)
         montant_max = law.minima_sociaux.aah.montant
         plaf_ress_aah = montant_max * (1 + en_couple + law.minima_sociaux.aah.tx_plaf_supp * af_nbenf)
-        montant_aah = min_(plaf_ress_aah - aah_base_ressources, montant_max) # Le montant de l'AAH est plafonné au montant de base.
-        montant_aah = max_(montant_aah, 0)
+        montant_aah = max_(0, min_(plaf_ress_aah - aah_base_ressources, montant_max)) # Le montant de l'AAH est plafonné au montant de base.
 
-        # Pour le moment, on ne neutralise pas l'aah en cas de non calculabilité pour pouvoir tester
-        return aah_eligible * montant_aah  # * not_(aah_non_calculable)
+        aah_base_non_cumulable = individu('aah_base_non_cumulable', period)
+
+        return aah_eligible * min_(montant_aah, max_(0, montant_max - aah_base_non_cumulable))
 
 
 class aah(Variable):
