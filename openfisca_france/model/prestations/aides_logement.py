@@ -251,7 +251,9 @@ class aide_logement_neutralisation_rsa(Variable):
     def formula(famille, period, parameters):
         # Circular definition, as rsa depends on al.
         # We don't allow it, so default value of rsa will be returned if a recursion is detected.
-        rsa_mois_dernier = famille('rsa', period.last_month, max_nb_cycles = 0)
+        holder = famille.get_holder('rsa')
+        rsa_mois_dernier = holder.get_array(period.last_month) or holder.default_array()
+        # rsa_mois_dernier = famille('rsa', period.last_month, max_nb_cycles = 0)
 
         revenus_a_neutraliser_i = famille.members('revenu_assimile_salaire_apres_abattements', period.n_2)
         revenus_a_neutraliser = famille.sum(revenus_a_neutraliser_i)
