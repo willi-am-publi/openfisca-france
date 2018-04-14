@@ -425,3 +425,36 @@
         2015: 20000
   output_variables:
     aide_logement_base_ressources_defaut: 0
+
+- name: "Aide logement - test incohérence"
+  period: 2017-10
+  relative_error_margin: 0.01
+  familles:
+    parents: ["parent1"]
+  menages:
+  individus:
+    - id: "parent1"
+      revenu_assimile_salaire_apres_abattements:
+        2015: 20000
+  output_variables:
+    aide_logement_base_ressources_defaut: 20000
+    rsa:
+      2017-09: 537
+
+- name: "Aide logement - test incohérence"
+  period: 2017-10
+  relative_error_margin: 0.01
+  familles:
+    parents: ["parent1"]
+  menages:
+  individus:
+    - id: "parent1"
+      revenu_assimile_salaire_apres_abattements:
+        2015: 20000
+  output_variables:
+    rsa:
+      2017-09: 537
+    aide_logement_base_ressources_defaut: 0
+
+
+
