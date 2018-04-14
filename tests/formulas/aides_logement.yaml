@@ -410,3 +410,18 @@
       livret_a: 20000
   output_variables:
     aide_logement_base_ressources_patrimoine: 600
+
+- name: "Aide logement - neutralisation de la BR si RSA"
+  period: 2017-10
+  relative_error_margin: 0.01
+  familles:
+    parents: ["parent1"]
+    rsa:
+      2017-09: 530
+  menages:
+  individus:
+    - id: "parent1"
+      revenu_assimile_salaire_apres_abattements:
+        2015: 20000
+  output_variables:
+    aide_logement_base_ressources_defaut: 0
