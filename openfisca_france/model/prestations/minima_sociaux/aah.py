@@ -219,27 +219,50 @@ class aah_base(Variable):
         af_nbenf = individu.famille('af_nbenf', period)
         montant_max = law.minima_sociaux.aah.montant
         plaf_ress_aah = montant_max * (1 + en_couple + law.minima_sociaux.aah.tx_plaf_supp * af_nbenf)
-        montant_aah = max_(0, min_(plaf_ress_aah - aah_base_ressources, montant_max)) # Le montant de l'AAH est plafonné au montant de base.
+        montant_aah = min_(montant_max, max_(0, plaf_ress_aah - aah_base_ressources)) # Le montant de l'AAH est plafonné au montant de base.
 
         aah_base_non_cumulable = individu('aah_base_non_cumulable', period)
 
         return aah_eligible * min_(montant_aah, max_(0, montant_max - aah_base_non_cumulable))
 
 
+class aah_personne_a_charge(Variable):
+    calculate_output = calculate_output_add
+    value_type = float
+    entity = Individu
+    definition_period = MONTH
+
+    def formula(individu, period, parameters):
+        law = parameters(period).prestations
+
+        famille_aah_eligible = individu.famille.any(individu.famille.members('aah_eligible', period))
+        aah_non_calculable = individu('aah_non_calculable', period)
+        aah_base_ressources = individu.famille('aah_base_ressources', period) / 12
+        en_couple = individu.famille('en_couple', period)
+        af_nbenf = individu.famille('af_nbenf', period)
+        prestations_familiales_enfant_a_charge = individu('prestations_familiales_enfant_a_charge', period)
+        montant_max = law.minima_sociaux.aah.montant
+        plaf_ress_aah = montant_max * (1 + en_couple + law.minima_sociaux.aah.tx_plaf_supp * af_nbenf)
+        aah_individus = individu.famille.sum(individu.famille.members('aah_base', period))
+
+        return min_(prestations_familiales_enfant_a_charge * montant_max * law.minima_sociaux.aah.tx_plaf_supp, max_(0, plaf_ress_aah - aah_base_ressources - aah_individus)) # Le montant de l'AAH est plafonné au montant de base.
+
+
 class aah(Variable):
     calculate_output = calculate_output_add
     value_type = float
-    label = u"Allocation adulte handicapé (Individu) mensualisée"
-    entity = Individu
+    label = u"Allocation adulte handicapé mensualisée"
+    entity = Famille
     definition_period = MONTH
     set_input = set_input_divide_by_period
 
-    def formula(individu, period, parameters):
-        aah_base = individu('aah_base', period)
+    def formula(famille, period, parameters):
+        aah_base = famille.sum(famille.members('aah_base', period))
+        aah_personne_a_charge = famille.sum(famille.members('aah_personne_a_charge', period))
         # caah
         # mva
 
-        return aah_base
+        return aah_base + aah_personne_a_charge
 
 
 class caah(Variable):
