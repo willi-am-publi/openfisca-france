@@ -77,10 +77,6 @@
       - 807.65
       - 807.65
       - 0
-    aah_personne_a_charge:
-      - 0
-      - 0
-      - 807.65 * 0.5
 
 
 - name: "AAH Eligibilité couple sans ressource avec enfant"
