@@ -70,6 +70,7 @@ class aah_base_ressources_eval_trimestrielle(Variable):
         last_year = period.last_year
 
         ressources_a_inclure = [
+            'asi',
             'allocation_securisation_professionnelle',
             'bourse_recherche',
             'chomage_net',
@@ -195,7 +196,7 @@ class aah_base_non_cumulable(Variable):
     definition_period = MONTH
 
     def formula(individu, period):
-        return individu('pensions_invalidite', period)
+        return individu('pensions_invalidite', period) + individu('asi', period)
 
 
 class aah_base(Variable):
