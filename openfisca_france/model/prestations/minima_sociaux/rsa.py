@@ -154,24 +154,24 @@ class rsa_base_ressources_minima_sociaux(Variable):
     def formula_2017_01_01(famille, mois_demande, parameters, mois_courant):
         # Prestations calculées que l'on réinjecte dans la BR du RSA
         aspa = famille('aspa', mois_demande)
-        asi = famille('asi', mois_demande)
         ass = famille('ass', mois_demande)
 
         aah_i = famille.members('aah', mois_courant)
+        asi_i = famille.members('asi', mois_courant)
         caah_i = famille.members('caah', mois_courant)
 
-        return aspa + asi + ass + famille.sum(aah_i + caah_i)
+        return aspa + ass + famille.sum(aah_i + asi_i + caah_i)
 
     def formula(famille, period):
         three_previous_months = period.last_3_months
         aspa = famille('aspa', period)
-        asi = famille('asi', period)
         ass = famille('ass', period)
 
         aah_i = famille.members('aah', period)
+        asi_i = famille.members('asi', period)
         caah_i = famille.members('caah', period, options = [ADD])
 
-        return aspa + asi + ass + famille.sum(aah_i + caah_i)
+        return aspa + ass + famille.sum(aah_i + asi_i + caah_i)
 
 
 class rsa_base_ressources_prestations_familiales(Variable):
