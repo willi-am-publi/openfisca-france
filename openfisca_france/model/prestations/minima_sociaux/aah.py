@@ -252,17 +252,18 @@ class aah(Variable):
     calculate_output = calculate_output_add
     value_type = float
     label = u"Allocation adulte handicapé mensualisée"
-    entity = Famille
+    entity = Individu
     definition_period = MONTH
     set_input = set_input_divide_by_period
 
-    def formula(famille, period, parameters):
-        aah_base = famille.sum(famille.members('aah_base', period))
-        aah_personne_a_charge = famille.sum(famille.members('aah_personne_a_charge', period))
+    def formula(individu, period, parameters):
+        aah_base = individu('aah_base', period)
+        aah_personne_a_charge = individu.famille.sum(individu.famille.members('aah_personne_a_charge', period))
+        aah_eligible = individu.famille.sum(individu.famille.members('aah_base', period) > 0)
         # caah
         # mva
 
-        return aah_base + aah_personne_a_charge
+        return aah_base + aah_personne_a_charge / aah_eligible
 
 
 class caah(Variable):
