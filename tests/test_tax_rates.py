@@ -3,26 +3,6 @@
 from openfisca_core.rates import average_rate, marginal_rate
 from cache import tax_benefit_system
 
-def test_average_tax_rate():
-    year = 2013
-    simulation = tax_benefit_system.new_scenario().init_single_entity(
-        axes = [
-            dict(
-                count = 100,
-                name = 'salaire_imposable',
-                max = 24000,
-                min = 0,
-                ),
-            ],
-        period = year,
-        parent1 = dict(age = 40),
-        ).new_simulation()
-    assert (average_rate(
-        target = simulation.calculate('revenu_disponible', period = year),
-        varying = simulation.calculate('revenu_disponible', period = year),
-        ) == 0).all()
-
-
 def test_marginal_tax_rate():
     year = 2013
     simulation = tax_benefit_system.new_scenario().init_single_entity(
@@ -36,7 +16,7 @@ def test_marginal_tax_rate():
             ],
         period = year,
         parent1 = dict(age = 40),
-        ).new_simulation()
+        ).new_simulation(trace=True)
     assert (marginal_rate(
         target = simulation.calculate('revenu_disponible', period = year),
         varying = simulation.calculate('revenu_disponible', period = year),
