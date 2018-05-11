@@ -1,20 +1,21 @@
 # -*- coding: utf-8 -*-
 
-import yaml
-import yamlordereddictloader
 import sys
 import pprint
+import io
+from ruamel.yaml import YAML
 
-filename = 'test_mes_aides_54d4e0704ec19fce442273a0.yaml'
+yaml = YAML()
+yaml.default_flow_style = False
 
 def migrateTestFile(path):
-	with open(path, 'r') as f:
-		data = yaml.load(f, Loader=yamlordereddictloader.Loader)
+    with io.open(path, 'r', encoding='utf8') as f:
+        data = yaml.load(f)
 
-	with open(path, 'w') as f:
-		yaml.dump(data, f, default_flow_style=False, allow_unicode=True, Dumper=yamlordereddictloader.SafeDumper)
+    with io.open(path, 'w', encoding='utf8') as f:
+        yaml.dump(data, f)
 
 
 if __name__ == "__main__":
-	for p in sys.argv[1:]:
-		migrateTestFile(p)
+    for p in sys.argv[1:]:
+        migrateTestFile(p)
