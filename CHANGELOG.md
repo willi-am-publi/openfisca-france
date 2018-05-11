@@ -1,5 +1,12 @@
 # Changelog
 
+### 21.10.10
+
+* Amélioration technique.
+* Zones impactées : `**/*.yaml`.
+* Détails :
+  - Normalisation des fichiers YAML.
+
 ### 21.10.9 [#1012](https://github.com/openfisca/openfisca-france/pull/1012)
 
 * Changement mineur.
