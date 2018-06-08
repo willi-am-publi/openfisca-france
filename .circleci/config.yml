@@ -34,7 +34,8 @@ jobs:
       - run:
           name: Run tests
           command: |
-            nosetests `circleci tests glob tests/**/*.py | circleci tests split`
+            CIRCLE_TEST_REPORTS="tests"
+            nosetests --with-xunit --xunit-file=$CIRCLE_TEST_REPORTS/nosetests_results.xml `circleci tests glob tests/**/*.py | circleci tests split`
             openfisca-run-test `circleci tests glob tests/**/*.{yaml,yml} | circleci tests split`
 
       - run:
