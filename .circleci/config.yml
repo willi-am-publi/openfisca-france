@@ -5,6 +5,8 @@ jobs:
     parallelism: 3  # Speed up the tests, while letting a container available for other builds.
     docker:
       - image: python:2.7.14
+    environment:
+        CIRCLE_TEST_REPORTS: tests/nosetests
 
     steps:
       - checkout
@@ -34,9 +36,13 @@ jobs:
       - run:
           name: Run tests
           command: |
-            CIRCLE_TEST_REPORTS="tests"
-            nosetests --with-xunit --xunit-file=$CIRCLE_TEST_REPORTS/nosetests_results.xml `circleci tests glob tests/**/*.py | circleci tests split`
+            mkdir -p {{ .Environment.CIRCLE_TEST_REPORTS }}
+            nosetests `circleci tests glob tests/**/*.py | circleci tests split` --with-xunit --xunit-file={{ .Environment.CIRCLE_TEST_REPORTS }}/results.xml
             openfisca-run-test `circleci tests glob tests/**/*.{yaml,yml} | circleci tests split`
+
+      - store_test_results:
+          path: {{ .Environment.CIRCLE_TEST_REPORTS }}
+
 
       - run:
           name: Check version number has been properly updated
@@ -79,6 +85,8 @@ jobs:
     parallelism: 3  # Speed up the tests, while letting a container available for other builds.
     docker:
       - image: python:3.6
+    environment:
+        CIRCLE_TEST_REPORTS: tests/nosetests
 
     steps:
       - checkout
@@ -108,8 +116,12 @@ jobs:
       - run:
           name: Run tests
           command: |
-            nosetests `circleci tests glob tests/**/*.py | circleci tests split`
+            mkdir -p {{ .Environment.CIRCLE_TEST_REPORTS }}
+            nosetests `circleci tests glob tests/**/*.py | circleci tests split` --with-xunit --xunit-file={{ .Environment.CIRCLE_TEST_REPORTS }}/results.xml
             openfisca-run-test `circleci tests glob tests/**/*.{yaml,yml} | circleci tests split`
+
+      - store_test_results:
+          path: {{ .Environment.CIRCLE_TEST_REPORTS }}
 
       - run:
           name: Check version number has been properly updated
