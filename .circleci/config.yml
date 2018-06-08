@@ -6,7 +6,7 @@ jobs:
     docker:
       - image: python:2.7.14
     environment:
-        CIRCLE_TEST_REPORTS: tests/nosetests
+        TEST_REPORTS: tests/nosetests
 
     steps:
       - checkout
@@ -36,12 +36,12 @@ jobs:
       - run:
           name: Run tests
           command: |
-            mkdir -p {{ .Environment.CIRCLE_TEST_REPORTS }}
-            nosetests `circleci tests glob tests/**/*.py | circleci tests split` --with-xunit --xunit-file={{ .Environment.CIRCLE_TEST_REPORTS }}/results.xml
+            mkdir -p ${TEST_REPORTS}
+            nosetests `circleci tests glob tests/**/*.py | circleci tests split` --with-xunit --xunit-file=${TEST_REPORTS}/results.xml
             openfisca-run-test `circleci tests glob tests/**/*.{yaml,yml} | circleci tests split`
 
       - store_test_results:
-          path: {{ .Environment.CIRCLE_TEST_REPORTS }}
+          path: ${TEST_REPORTS}
 
 
       - run:
@@ -86,7 +86,7 @@ jobs:
     docker:
       - image: python:3.6
     environment:
-        CIRCLE_TEST_REPORTS: tests/nosetests
+        TEST_REPORTS: tests/nosetests
 
     steps:
       - checkout
@@ -116,12 +116,12 @@ jobs:
       - run:
           name: Run tests
           command: |
-            mkdir -p {{ .Environment.CIRCLE_TEST_REPORTS }}
-            nosetests `circleci tests glob tests/**/*.py | circleci tests split` --with-xunit --xunit-file={{ .Environment.CIRCLE_TEST_REPORTS }}/results.xml
+            mkdir -p ${TEST_REPORTS}
+            nosetests `circleci tests glob tests/**/*.py | circleci tests split` --with-xunit --xunit-file=${TEST_REPORTS}/results.xml
             openfisca-run-test `circleci tests glob tests/**/*.{yaml,yml} | circleci tests split`
 
       - store_test_results:
-          path: {{ .Environment.CIRCLE_TEST_REPORTS }}
+          path: ${TEST_REPORTS}
 
       - run:
           name: Check version number has been properly updated
