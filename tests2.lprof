@@ -1,0 +1,202 @@
+Timer unit: 1e-06 s
+
+Total time: 150.021 s
+File: /Users/hyperion/Sites/dinsic/openfisca/openfisca-france/openfisca_france/model/prelevements_obligatoires/prelevements_sociaux/cotisations_sociales/base.py
+Function: apply_bareme_for_relevant_type_sal at line 8
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+     8                                           @profile
+     9                                           def apply_bareme_for_relevant_type_sal(
+    10                                                   bareme_by_type_sal_name,
+    11                                                   bareme_name,
+    12                                                   categorie_salarie,
+    13                                                   base,
+    14                                                   plafond_securite_sociale,
+    15                                                   round_base_decimals=DEFAULT_ROUND_BASE_DECIMALS):
+    16    470478     232847.0      0.5      0.2      assert bareme_by_type_sal_name is not None
+    17    470478     190769.0      0.4      0.1      assert bareme_name is not None
+    18    470478     170274.0      0.4      0.1      assert categorie_salarie is not None
+    19    470478     167535.0      0.4      0.1      assert base is not None
+    20    470478     165278.0      0.4      0.1      assert plafond_securite_sociale is not None
+    21    470478     259136.0      0.6      0.2      TypesCategorieSalarie = categorie_salarie.possible_values
+    22
+    23    470478     251424.0      0.5      0.2      return - sum(iter_cotisations(TypesCategorieSalarie,
+    24    470478     151107.0      0.3      0.1                                    bareme_by_type_sal_name,
+    25    470478     144634.0      0.3      0.1                                    bareme_name,
+    26    470478     143533.0      0.3      0.1                                    categorie_salarie,
+    27    470478     144644.0      0.3      0.1                                    base,
+    28    470478     151635.0      0.3      0.1                                    plafond_securite_sociale,
+    29    470478  147847883.0    314.3     98.6                                    round_base_decimals))
+
+Total time: 248.53 s
+File: /Users/hyperion/Sites/dinsic/openfisca/openfisca-france/openfisca_france/model/prelevements_obligatoires/prelevements_sociaux/cotisations_sociales/base.py
+Function: apply_bareme at line 32
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+    32                                           @profile
+    33                                           def apply_bareme(individu,
+    34                                                            period,
+    35                                                            parameters,
+    36                                                            cotisation_type=None,
+    37                                                            bareme_name=None,
+    38                                                            variable_name=None):
+    39    192558    6545065.0     34.0      2.6      cotisation_mode_recouvrement = individu('cotisation_sociale_mode_recouvrement', period)
+    40    192558     138050.0      0.7      0.1      TypesCotisationSocialeModeRecouvrement = cotisation_mode_recouvrement.possible_values
+    41                                               cotisation = (
+    42                                                   # anticipé (mensuel avec recouvrement en fin d'année)
+    43                                                   cotisation_mode_recouvrement == TypesCotisationSocialeModeRecouvrement.mensuel) * (
+    44                                                       compute_cotisation_anticipee(
+    45                                                           individu,
+    46                                                           period,
+    47                                                           parameters,
+    48                                                           cotisation_type = cotisation_type,
+    49                                                           bareme_name = bareme_name,
+    50                                                           variable_name = variable_name,
+    51                                                           )
+    52                                                       ) + (
+    53                                                   # en fin d'année
+    54                                                   cotisation_mode_recouvrement == TypesCotisationSocialeModeRecouvrement.annuel) * (
+    55                                                       compute_cotisation_annuelle(
+    56                                                           individu,
+    57                                                           period,
+    58                                                           parameters,
+    59                                                           cotisation_type = cotisation_type,
+    60                                                           bareme_name = bareme_name,
+    61                                                           )
+    62    192558  142934531.0    742.3     57.5              ) + (
+    63                                                   # mensuel stricte
+    64    192558     783495.0      4.1      0.3          cotisation_mode_recouvrement == TypesCotisationSocialeModeRecouvrement.mensuel_strict) * (
+    65    192558      89380.0      0.5      0.0              compute_cotisation(
+    66    192558      71097.0      0.4      0.0                  individu,
+    67    192558      67932.0      0.4      0.0                  period,
+    68    192558      75445.0      0.4      0.0                  parameters,
+    69    192558      71629.0      0.4      0.0                  cotisation_type = cotisation_type,
+    70    192558   97675170.0    507.3     39.3                  bareme_name = bareme_name,
+    71                                                           )
+    72                                                       )
+    73    192558      78544.0      0.4      0.0      return cotisation
+
+Total time: 231.387 s
+File: /Users/hyperion/Sites/dinsic/openfisca/openfisca-france/openfisca_france/model/prelevements_obligatoires/prelevements_sociaux/cotisations_sociales/base.py
+Function: compute_cotisation at line 76
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+    76                                           @profile
+    77                                           def compute_cotisation(individu,
+    78                                                                  period,
+    79                                                                  parameters,
+    80                                                                  cotisation_type=None,
+    81                                                                  bareme_name=None):
+    82    399171     234031.0      0.6      0.1      assert cotisation_type is not None
+    83    399171    2079524.0      5.2      0.9      law = parameters(period)
+    84    399171     212012.0      0.5      0.1      if cotisation_type == "employeur":
+    85      1061        995.0      0.9      0.0          bareme_by_type_sal_name = law.cotsoc.cotisations_employeur
+    86    398110     194133.0      0.5      0.1      elif cotisation_type == "salarie":
+    87    398110     358047.0      0.9      0.2          bareme_by_type_sal_name = law.cotsoc.cotisations_salarie
+    88    399171     188945.0      0.5      0.1      assert bareme_name is not None
+    89
+    90    399171     172336.0      0.4      0.1      assiette_cotisations_sociales = individu('assiette_cotisations_sociales',
+    91    399171     171011.0      0.4      0.1                                               period,
+    92    399171   46993403.0    117.7     20.3                                               options=[ADD])
+    93
+    94    399171     273640.0      0.7      0.1      plafond_securite_sociale = individu('plafond_securite_sociale',
+    95    399171     181493.0      0.5      0.1                                          period,
+    96    399171   36242287.0     90.8     15.7                                          options=[ADD])
+    97
+    98    399171   13717663.0     34.4      5.9      categorie_salarie = individu('categorie_salarie', period.first_month)
+    99
+   100    399171     271925.0      0.7      0.1      cotisation = apply_bareme_for_relevant_type_sal(bareme_by_type_sal_name=bareme_by_type_sal_name,
+   101    399171     187954.0      0.5      0.1                                                      bareme_name=bareme_name,
+   102    399171     175621.0      0.4      0.1                                                      base=assiette_cotisations_sociales,
+   103    399171     172538.0      0.4      0.1                                                      plafond_securite_sociale=plafond_securite_sociale,
+   104    399171  129365142.0    324.1     55.9                                                      categorie_salarie=categorie_salarie)
+   105
+   106    399171     194105.0      0.5      0.1      return cotisation
+
+Total time: 18.1971 s
+File: /Users/hyperion/Sites/dinsic/openfisca/openfisca-france/openfisca_france/model/prelevements_obligatoires/prelevements_sociaux/cotisations_sociales/base.py
+Function: compute_cotisation_annuelle at line 109
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+   109                                           @profile
+   110                                           def compute_cotisation_annuelle(individu,
+   111                                                                           period,
+   112                                                                           parameters,
+   113                                                                           cotisation_type=None,
+   114                                                                           bareme_name=None):
+   115
+   116    192558     427632.0      2.2      2.4      if period.start.month < 12:
+   117    178503      64105.0      0.4      0.4          return 0
+   118
+   119     14055       5859.0      0.4      0.0      return compute_cotisation(individu,
+   120     14055     185936.0     13.2      1.0                                period.this_year,
+   121     14055       5907.0      0.4      0.0                                parameters,
+   122     14055       4479.0      0.3      0.0                                cotisation_type=cotisation_type,
+   123     14055   17503153.0   1245.3     96.2                                bareme_name=bareme_name)
+
+Total time: 130.274 s
+File: /Users/hyperion/Sites/dinsic/openfisca/openfisca-france/openfisca_france/model/prelevements_obligatoires/prelevements_sociaux/cotisations_sociales/base.py
+Function: compute_cotisation_anticipee at line 126
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+   126                                           @profile
+   127                                           def compute_cotisation_anticipee(individu,
+   128                                                                            period,
+   129                                                                            parameters,
+   130                                                                            cotisation_type=None,
+   131                                                                            bareme_name=None,
+   132                                                                            variable_name=None):
+   133
+   134    192558     355525.0      1.8      0.3      if period.start.month < 12:
+   135    178503      91456.0      0.5      0.1          return compute_cotisation(individu,
+   136    178503    1989955.0     11.1      1.5                                    period.first_month,
+   137    178503      88521.0      0.5      0.1                                    parameters,
+   138    178503      73539.0      0.4      0.1                                    cotisation_type=cotisation_type,
+   139    178503  104434298.0    585.1     80.2                                    bareme_name=bareme_name)
+   140
+   141     14055       6669.0      0.5      0.0      cumul = individu(variable_name,
+   142     14055     258267.0     18.4      0.2                       period.start.offset('first-of', 'month').offset(-11, 'month').period('month', 11),
+   143     14055       7388.0      0.5      0.0                       max_nb_cycles=1,
+   144     14055    5167349.0    367.7      4.0                       options=[ADD])
+   145                                               # December variable_name depends on variable_name in the past 11 months
+   146                                               # We need to explicitely allow this recursion.
+   147
+   148     14055      11329.0      0.8      0.0      return compute_cotisation(individu,
+   149     14055     157826.0     11.2      0.1                                period.this_year,
+   150     14055       7702.0      0.5      0.0                                parameters,
+   151     14055       6159.0      0.4      0.0                                cotisation_type=cotisation_type,
+   152     14055   17618128.0   1253.5     13.5                                bareme_name=bareme_name) - cumul
+
+Total time: 129.247 s
+File: /Users/hyperion/Sites/dinsic/openfisca/openfisca-france/openfisca_france/model/prelevements_obligatoires/prelevements_sociaux/cotisations_sociales/base.py
+Function: iter_cotisations at line 155
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+   155                                           @profile
+   156                                           def iter_cotisations(types_categorie_salarie,
+   157                                                                bareme_by_type_sal_name,
+   158                                                                bareme_name,
+   159                                                                categorie_salarie,
+   160                                                                base,
+   161                                                                plafond_securite_sociale,
+   162                                                                round_base_decimals):
+   163   4234302    6532736.0      1.5      5.1      for type_sal in types_categorie_salarie:
+   164   3763824    5518846.0      1.5      4.3          type_sal_name = type_sal.name
+   165   3763824    1270842.0      0.3      1.0          try:
+   166   3763824    7858895.0      2.1      6.1              node = bareme_by_type_sal_name[type_sal_name]
+   167    940956     566261.0      0.6      0.4          except KeyError:
+   168    940956     297758.0      0.3      0.2              continue  # to deal with public_titulaire_militaire
+   169   2822868     981375.0      0.3      0.8          try:
+   170   2822868    5807372.0      2.1      4.5              bareme = node[bareme_name]
+   171   1820853    1153558.0      0.6      0.9          except KeyError:
+   172   1820853     584940.0      0.3      0.5              continue
+   173   1002015    6968148.0      7.0      5.4          yield bareme.calc(base * (categorie_salarie == type_sal),
+   174   1002015     486351.0      0.5      0.4                            factor=plafond_securite_sociale,
+   175   1002015   91220001.0     91.0     70.6                            round_base_decimals=round_base_decimals)
+

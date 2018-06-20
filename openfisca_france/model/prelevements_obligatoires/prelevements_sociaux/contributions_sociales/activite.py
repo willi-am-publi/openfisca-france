@@ -194,27 +194,28 @@ class salaire_imposable(Variable):
     definition_period = MONTH
 
     def formula(individu, period):
-        salaire_de_base = individu('salaire_de_base', period)
-        primes_salaires = individu('primes_salaires', period)
-        primes_fonction_publique = individu('primes_fonction_publique', period)
-        indemnite_residence = individu('indemnite_residence', period)
-        supp_familial_traitement = individu('supp_familial_traitement', period)
-        csg_deductible_salaire = individu('csg_deductible_salaire', period)
-        cotisations_salariales = individu('cotisations_salariales', period)
-        remuneration_principale = individu('remuneration_principale', period)
-        hsup = individu('hsup', period)
-        indemnite_fin_contrat = individu('indemnite_fin_contrat', period)
-        complementaire_sante_salarie = individu('complementaire_sante_salarie', period)
+        with profile:
+            salaire_de_base = individu('salaire_de_base', period)
+            primes_salaires = individu('primes_salaires', period)
+            primes_fonction_publique = individu('primes_fonction_publique', period)
+            indemnite_residence = individu('indemnite_residence', period)
+            supp_familial_traitement = individu('supp_familial_traitement', period)
+            csg_deductible_salaire = individu('csg_deductible_salaire', period)
+            cotisations_salariales = individu('cotisations_salariales', period)
+            remuneration_principale = individu('remuneration_principale', period)
+            hsup = individu('hsup', period)
+            indemnite_fin_contrat = individu('indemnite_fin_contrat', period)
+            complementaire_sante_salarie = individu('complementaire_sante_salarie', period)
 
-        # Revenu du foyer fiscal projeté sur le demandeur
-        rev_microsocial = individu.foyer_fiscal('rev_microsocial', period, options = [DIVIDE])
-        rev_microsocial_declarant1 = rev_microsocial * individu.has_role(FoyerFiscal.DECLARANT_PRINCIPAL)
+            # Revenu du foyer fiscal projeté sur le demandeur
+            rev_microsocial = individu.foyer_fiscal('rev_microsocial', period, options = [DIVIDE])
+            rev_microsocial_declarant1 = rev_microsocial * individu.has_role(FoyerFiscal.DECLARANT_PRINCIPAL)
 
-        return (
-            salaire_de_base + primes_salaires + remuneration_principale +
-            primes_fonction_publique + indemnite_residence + supp_familial_traitement + csg_deductible_salaire +
-            cotisations_salariales - hsup + rev_microsocial_declarant1 + indemnite_fin_contrat + complementaire_sante_salarie
-            )
+            return (
+                salaire_de_base + primes_salaires + remuneration_principale +
+                primes_fonction_publique + indemnite_residence + supp_familial_traitement + csg_deductible_salaire +
+                cotisations_salariales - hsup + rev_microsocial_declarant1 + indemnite_fin_contrat + complementaire_sante_salarie
+                )
 
 
 class salaire_net(Variable):
