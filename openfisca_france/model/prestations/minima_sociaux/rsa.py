@@ -345,14 +345,13 @@ class rsa_enfant_a_charge(Variable):
                 )
 
         # Les parametres ont changé de nom au moment où le RMI est devenu le RSA
+        majoration_parent_isole = P_rsa.majoration_parent_isole
         if period.start.date >= date(2009, 6, 1):
             age_pac = P_rsa.age_pac
-            majo_rsa = P_rsa.majo_rsa
             montant_base_rsa = P_rsa.montant_de_base_du_rsa
             taux_personne_supp = P_rsa.majoration_rsa.taux_personne_supp
         else:
             age_pac = P_rmi.age_pac
-            majo_rsa = P_rmi.majo_rsa
             montant_base_rsa = P_rmi.rmi
             taux_personne_supp = P_rmi.txps
 
@@ -376,7 +375,7 @@ class rsa_enfant_a_charge(Variable):
 
         rsa_enf_charge = enfant * not_(autonomie_financiere) * (age <= age_pac) * where(
             ouvre_droit_majoration(),
-            ressources < (majo_rsa.pac0 - 1 + majo_rsa.pac_enf_sup) * montant_base_rsa,
+            ressources < (majoration_parent_isole.femmes_enceintes - 1 + majoration_parent_isole.par_enfant_a_charge) * montant_base_rsa,
             ressources < taux_personne_supp * montant_base_rsa
             )
 
@@ -1001,7 +1000,7 @@ class rsa_socle_majore(Variable):
         nbenf = famille('rsa_nb_enfants', period)
 
         rsa = parameters(period).prestations.minima_sociaux.rsa
-        taux = rsa.majo_rsa.pac0 + rsa.majo_rsa.pac_enf_sup * nbenf
+        taux = rsa.majoration_parent_isole.femmes_enceintes + rsa.majoration_parent_isole.par_enfant_a_charge * nbenf
         socle = rsa.montant_de_base_du_rsa
 
         return eligib * socle * taux
