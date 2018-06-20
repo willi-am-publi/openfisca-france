@@ -76,10 +76,10 @@ def generate_tests(tax_benefit_system, paths, options = {}):
 
     for path in paths:
         if os.path.isdir(path):
-            for test in _generate_tests_from_directory(tax_benefit_system, path, options):
+            for test in list(_generate_tests_from_directory(tax_benefit_system, path, options)):
                 yield test
         else:
-            for test in _generate_tests_from_file(tax_benefit_system, path, options):
+            for test in list(_generate_tests_from_file(tax_benefit_system, path, options)):
                 yield test
 
 
@@ -129,9 +129,9 @@ def _generate_tests_from_file(tax_benefit_system, path_to_file, options):
     only_variables = options.get('only_variables')
     ignore_variables = options.get('ignore_variables')
 
-    tests = _parse_test_file(tax_benefit_system, path_to_file)
+    tests = []
 
-    for test_index, (path_to_file, name, period_str, test) in enumerate(tests, 1):
+    for test_index, (path_to_file, name, period_str, test) in enumerate(_parse_test_file(tax_benefit_system, path_to_file), 1):
         if name_filter is not None and name_filter not in filename \
                 and name_filter not in (test.get('name', u'')) \
                 and name_filter not in (test.get('keywords', [])):
@@ -145,14 +145,21 @@ def _generate_tests_from_file(tax_benefit_system, path_to_file, options):
             period_str,
             )
 
+        scenario = test['scenario']
+        scenario.suggest()
+        simulation = scenario.new_simulation(trace = verbose)
+
+
         def check():
             try:
-                _run_test(period_str, test, verbose, only_variables, ignore_variables, options)
+                _run_test(period_str, test, simulation, verbose, only_variables, ignore_variables, options)
             except Exception:
                 log.error(title)
                 raise
 
-        yield unittest.FunctionTestCase(check)
+        tests.append(unittest.FunctionTestCase(check))
+
+    return tests
 
 
 def _generate_tests_from_directory(tax_benefit_system, path_to_dir, options):
@@ -160,11 +167,11 @@ def _generate_tests_from_directory(tax_benefit_system, path_to_dir, options):
     subdirectories = glob.glob(os.path.join(path_to_dir, "*/"))
 
     for yaml_path in yaml_paths:
-        for test in _generate_tests_from_file(tax_benefit_system, yaml_path, options):
+        for test in list(_generate_tests_from_file(tax_benefit_system, yaml_path, options)):
             yield test
 
     for subdirectory in subdirectories:
-        for test in _generate_tests_from_directory(tax_benefit_system, subdirectory, options):
+        for test in list(_generate_tests_from_directory(tax_benefit_system, subdirectory, options)):
             yield test
 
 
@@ -218,7 +225,7 @@ def _parse_test_file(tax_benefit_system, yaml_path):
         yield yaml_path, test.get('name') or filename, to_unicode(test['scenario'].period), test
 
 
-def _run_test(period_str, test, verbose = False, only_variables = None, ignore_variables = None, options = {}):
+def _run_test(period_str, test, simulation, verbose = False, only_variables = None, ignore_variables = None, options = {}):
     absolute_error_margin = None
     relative_error_margin = None
     if test.get('absolute_error_margin') is not None:
@@ -226,9 +233,6 @@ def _run_test(period_str, test, verbose = False, only_variables = None, ignore_v
     if test.get('relative_error_margin') is not None:
         relative_error_margin = test.get('relative_error_margin')
 
-    scenario = test['scenario']
-    scenario.suggest()
-    simulation = scenario.new_simulation(trace = verbose)
     output_variables = test.get(u'output_variables')
     if output_variables is not None:
         try:
