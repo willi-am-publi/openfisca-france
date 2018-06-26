@@ -1,6 +1,6 @@
 description: Montant de base du RSA
 reference: ipp
-unit: currency
+unit: EUR
 values:
   2009-06-01:
     value: 454.63
