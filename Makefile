@@ -21,5 +21,17 @@ test: check-syntax-errors check-no-prints
 	nosetests tests --exe --with-doctest
 	openfisca-run-test --country-package openfisca_france tests
 
-performance:
-	python openfisca_france/scripts/performance_tests/test_tests.py
+cperf:
+	python -m cProfile -o tests.cprof ./openfisca_france/scripts/performance_tests/test_tests.py
+
+cstat:
+	python -c "import pstats; p = pstats.Stats('tests.cprof'); p.strip_dirs().sort_stats('tottime').print_stats(10)"
+
+ccall:
+	python -c "import pstats; p = pstats.Stats('tests.cprof'); p.strip_dirs().sort_stats('tottime').print_callers(10)"
+
+lperf:
+	pip install -e /Users/hyperion/Sites/dinsic/openfisca/openfisca-core
+	kernprof -v -l ./openfisca_france/scripts/performance_tests/test_tests.py
+	python -m line_profiler test_tests.py.lprof > tests.lprof
+	rm test_tests.py.lprof
