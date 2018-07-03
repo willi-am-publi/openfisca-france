@@ -1,6 +1,6 @@
 Timer unit: 1e-06 s
 
-Total time: 17.3622 s
+Total time: 79.4635 s
 File: /Users/hyperion/Sites/dinsic/openfisca/openfisca-core/openfisca_core/entities.py
 Function: check_variable_defined_for_entity at line 170
 
@@ -8,8 +8,8 @@ Line #      Hits         Time  Per Hit   % Time  Line Contents
 ==============================================================
    170                                               @profile
    171                                               def check_variable_defined_for_entity(self, variable_name):
-   172   6422093   13518186.0      2.1     77.9          variable_entity = self.simulation.tax_benefit_system.get_variable(variable_name, check_existence = True).entity
-   173   6422093    3844023.0      0.6     22.1          if not isinstance(self, variable_entity):
+   172  13815484   71670481.0      5.2     90.2          variable_entity = self.simulation.tax_benefit_system.get_variable(variable_name, check_existence = True).entity
+   173  13815484    7793028.0      0.6      9.8          if not isinstance(self, variable_entity):
    174                                                       message = linesep.join([
    175                                                           u"You tried to compute the variable '{0}' for the entity '{1}';".format(variable_name, self.plural),
    176                                                           u"however the variable '{0}' is defined for '{1}'.".format(variable_name, variable_entity.plural),
@@ -17,609 +17,78 @@ Line #      Hits         Time  Per Hit   % Time  Line Contents
    178                                                           u"<http://openfisca.org/doc/coding-the-legislation/50_entities.html>."])
    179                                                       raise ValueError(message)
 
-Total time: 342.465 s
-File: /Users/hyperion/Sites/dinsic/openfisca/openfisca-core/openfisca_core/entities.py
-Function: __call__ at line 201
-
-Line #      Hits         Time  Per Hit   % Time  Line Contents
-==============================================================
-   201                                               @profile
-   202                                               def __call__(self, variable_name, period = None, options = [], **parameters):
-   203                                                   """
-   204                                                       Calculate the variable ``variable_name`` for the entity and the period ``period``, using the variable formula if it exists.
-   205                                           
-   206                                                       Example:
-   207                                           
-   208                                                       >>> person('salary', '2017-04')
-   209                                                       >>> array([300.])
-   210                                           
-   211                                                       :returns: A numpy array containing the result of the calculation
-   212                                                   """
-   213   2810549   18928382.0      6.7      5.5          self.check_variable_defined_for_entity(variable_name)
-   214                                           
-   215   2810549    3351442.0      1.2      1.0          self.check_period_validity(variable_name, period)
-   216                                           
-   217   2810549    1542496.0      0.5      0.5          if ADD in options and DIVIDE in options:
-   218                                                       raise ValueError(u'Options ADD and DIVIDE are incompatible (trying to compute variable {})'.format(variable_name).encode('utf-8'))
-   219   2810549    1241979.0      0.4      0.4          elif ADD in options:
-   220    623837  133066470.0    213.3     38.9              return self.simulation.calculate_add(variable_name, period, **parameters)
-   221   2186712     974412.0      0.4      0.3          elif DIVIDE in options:
-   222     34666    3294893.0     95.0      1.0              return self.simulation.calculate_divide(variable_name, period, **parameters)
-   223                                                   else:
-   224   2152046  180064635.0     83.7     52.6              return self.simulation.calculate(variable_name, period, **parameters)
-
-Total time: 27.111 s
-File: /Users/hyperion/Sites/dinsic/openfisca/openfisca-core/openfisca_core/entities.py
-Function: get_holder at line 236
-
-Line #      Hits         Time  Per Hit   % Time  Line Contents
-==============================================================
-   236                                               @profile
-   237                                               def get_holder(self, variable_name):
-   238   3611544   19847484.0      5.5     73.2          self.check_variable_defined_for_entity(variable_name)
-   239   3611544    2440480.0      0.7      9.0          holder = self._holders.get(variable_name)
-   240   3611544    1356900.0      0.4      5.0          if holder:
-   241   3437412    1113852.0      0.3      4.1              return holder
-   242    174132     253887.0      1.5      0.9          variable = self.simulation.tax_benefit_system.get_variable(variable_name)
-   243    174132      68775.0      0.4      0.3          self._holders[variable_name] = holder = Holder(
-   244    174132      62916.0      0.4      0.2              entity = self,
-   245    174132    1904058.0     10.9      7.0              variable = variable,
-   246                                                       )
-   247    174132      62684.0      0.4      0.2          return holder
-
-Total time: 62.8639 s
-File: /Users/hyperion/Sites/dinsic/openfisca/openfisca-core/openfisca_core/holders.py
-Function: get_array at line 78
-
-Line #      Hits         Time  Per Hit   % Time  Line Contents
-==============================================================
-    78                                               @profile
-    79                                               def get_array(self, period, extra_params = None):
-    80                                                   """
-    81                                                       Get the value of the variable for the given period (and possibly a list of extra parameters).
-    82                                           
-    83                                                       If the value is not known, return ``None``.
-    84                                                   """
-    85   3837239    2313341.0      0.6      3.7          if self.variable.is_neutralized:
-    86                                                       return self.default_array()
-    87   3837239   57538044.0     15.0     91.5          value = self._memory_storage.get(period, extra_params)
-    88   3837239    1560106.0      0.4      2.5          if value is not None:
-    89   2444061     812436.0      0.3      1.3              return value
-    90   1393178     639972.0      0.5      1.0          if self._disk_storage:
-    91                                                       return self._disk_storage.get(period, extra_params)
-
-Total time: 31.2465 s
-File: /Users/hyperion/Sites/dinsic/openfisca/openfisca-core/openfisca_core/holders.py
-Function: put_in_cache at line 184
-
-Line #      Hits         Time  Per Hit   % Time  Line Contents
-==============================================================
-   184                                               @profile
-   185                                               def put_in_cache(self, value, period, extra_params = None):
-   186   1297085     948424.0      0.7      3.0          if self._do_not_store:
-   187                                                       return
-   188                                           
-   189   1297085     883568.0      0.7      2.8          simulation = self.simulation
-   190                                           
-   191   1297085    1080683.0      0.8      3.5          if self.variable.value_type == Enum:
-   192     60443     451117.0      7.5      1.4              value = self.variable.possible_values.encode(value)
-   193                                           
-   194   1297085    1348224.0      1.0      4.3          if value.dtype != self.variable.dtype:
-   195      9626       5752.0      0.6      0.0              try:
-   196      9626      35075.0      3.6      0.1                  value = value.astype(self.variable.dtype)
-   197                                                       except ValueError:
-   198                                                           raise ValueError(
-   199                                                               u'Unable to set value "{}" for variable "{}", as the variable dtype "{}" does not match the value dtype "{}".'
-   200                                                               .format(value, self.variable.name, self.variable.dtype, value.dtype)
-   201                                                               .encode('utf-8'))
-   202                                           
-   203   1297085    1057150.0      0.8      3.4          if self.variable.definition_period != ETERNITY:
-   204   1295359     817042.0      0.6      2.6              if period is None:
-   205                                                           raise ValueError('A period must be specified to put values in cache, except for variables with ETERNITY as as period_definition.')
-   206   1295359    2021196.0      1.6      6.5              if ((self.variable.definition_period == MONTH and period.unit != periods.MONTH) or
-   207   1295359    1116050.0      0.9      3.6                 (self.variable.definition_period == YEAR and period.unit != periods.YEAR)):
-   208                                                           error_message = os.linesep.join([
-   209                                                               u'Unable to set a value for variable {0} for {1}-long period {2}.',
-   210                                                               u'{0} is only defined for {3}s. Please adapt your input.',
-   211                                                               u'If you are the maintainer of {0}, you can consider adding it a set_input attribute to enable automatic period casting.'
-   212                                                               ]).format(
-   213                                                                   self.variable.name,
-   214                                                                   period.unit,
-   215                                                                   period,
-   216                                                                   self.variable.definition_period
-   217                                                               ).encode('utf-8')
-   218                                           
-   219                                                           raise PeriodMismatchError(
-   220                                                               self.variable.name,
-   221                                                               period,
-   222                                                               self.variable.definition_period,
-   223                                                               error_message
-   224                                                               )
-   225                                           
-   226   1297085     900716.0      0.7      2.9          if (simulation.opt_out_cache and
-   227                                                           simulation.tax_benefit_system.cache_blacklist and
-   228                                                           self.variable.name in simulation.tax_benefit_system.cache_blacklist):
-   229                                                       return
-   230                                           
-   231                                                   should_store_on_disk = (
-   232   1297085    1035462.0      0.8      3.3              self._on_disk_storable and
-   233                                                       self._memory_storage.get(period, extra_params) is None and  # If there is already a value in memory, replace it and don't put a new value in the disk storage
-   234                                                       psutil.virtual_memory().percent >= self.simulation.memory_config.max_memory_occupation_pc
-   235                                                       )
-   236                                           
-   237   1297085     815578.0      0.6      2.6          if should_store_on_disk:
-   238                                                       self._disk_storage.put(period, value, extra_params)
-   239                                                   else:
-   240   1297085   18730423.0     14.4     59.9              self._memory_storage.put(period, value, extra_params)
-
-Total time: 37.0084 s
-File: /Users/hyperion/Sites/dinsic/openfisca/openfisca-core/openfisca_core/periods.py
-Function: get_subperiods at line 414
-
-Line #      Hits         Time  Per Hit   % Time  Line Contents
-==============================================================
-   414                                               @profile
-   415                                               def get_subperiods(self, unit):
-   416                                                   """
-   417                                                       Return the list of all the periods of unit ``unit`` contained in self.
-   418                                           
-   419                                                       Examples:
-   420                                           
-   421                                                       >>> period('2017').get_subperiods(MONTH)
-   422                                                       >>> [period('2017-01'), period('2017-02'), ... period('2017-12')]
-   423                                           
-   424                                                       >>> period('year:2014:2').get_subperiods(YEAR)
-   425                                                       >>> [period('2014'), period('2015')]
-   426                                                   """
-   427    623837     797474.0      1.3      2.2          if self.unit == MONTH and unit == YEAR:
-   428                                                       raise ValueError(u'Cannot subdivise months into years')
-   429    623837     546058.0      0.9      1.5          if self.unit == YEAR and unit == YEAR:
-   430     16298     247988.0     15.2      0.7              return [self.this_year.offset(i, YEAR) for i in range(self.size)]
-   431                                           
-   432   1925306   35416849.0     18.4     95.7          return [self.first_month.offset(i, MONTH) for i in range(self.size_in_months)]
-
-Total time: 14.09 s
-File: /Users/hyperion/Sites/dinsic/openfisca/openfisca-core/openfisca_core/periods.py
-Function: offset at line 434
-
-Line #      Hits         Time  Per Hit   % Time  Line Contents
-==============================================================
-   434                                               @profile
-   435                                               def offset(self, offset, unit = None):
-   436                                                   """Increment (or decrement) the given period with offset units.
-   437                                           
-   438                                                   >>> period('day', 2014).offset(1)
-   439                                                   Period((u'day', Instant((2014, 1, 2)), 365))
-   440                                                   >>> period('day', 2014).offset(1, 'day')
-   441                                                   Period((u'day', Instant((2014, 1, 2)), 365))
-   442                                                   >>> period('day', 2014).offset(1, 'month')
-   443                                                   Period((u'day', Instant((2014, 2, 1)), 365))
-   444                                                   >>> period('day', 2014).offset(1, 'year')
-   445                                                   Period((u'day', Instant((2015, 1, 1)), 365))
-   446                                           
-   447                                                   >>> period('month', 2014).offset(1)
-   448                                                   Period((u'month', Instant((2014, 2, 1)), 12))
-   449                                                   >>> period('month', 2014).offset(1, 'day')
-   450                                                   Period((u'month', Instant((2014, 1, 2)), 12))
-   451                                                   >>> period('month', 2014).offset(1, 'month')
-   452                                                   Period((u'month', Instant((2014, 2, 1)), 12))
-   453                                                   >>> period('month', 2014).offset(1, 'year')
-   454                                                   Period((u'month', Instant((2015, 1, 1)), 12))
-   455                                           
-   456                                                   >>> period('year', 2014).offset(1)
-   457                                                   Period((u'year', Instant((2015, 1, 1)), 1))
-   458                                                   >>> period('year', 2014).offset(1, 'day')
-   459                                                   Period((u'year', Instant((2014, 1, 2)), 1))
-   460                                                   >>> period('year', 2014).offset(1, 'month')
-   461                                                   Period((u'year', Instant((2014, 2, 1)), 1))
-   462                                                   >>> period('year', 2014).offset(1, 'year')
-   463                                                   Period((u'year', Instant((2015, 1, 1)), 1))
-   464                                           
-   465                                                   >>> period('day', '2011-2-28').offset(1)
-   466                                                   Period((u'day', Instant((2011, 3, 1)), 1))
-   467                                                   >>> period('month', '2011-2-28').offset(1)
-   468                                                   Period((u'month', Instant((2011, 3, 28)), 1))
-   469                                                   >>> period('year', '2011-2-28').offset(1)
-   470                                                   Period((u'year', Instant((2012, 2, 28)), 1))
-   471                                           
-   472                                                   >>> period('day', '2011-3-1').offset(-1)
-   473                                                   Period((u'day', Instant((2011, 2, 28)), 1))
-   474                                                   >>> period('month', '2011-3-1').offset(-1)
-   475                                                   Period((u'month', Instant((2011, 2, 1)), 1))
-   476                                                   >>> period('year', '2011-3-1').offset(-1)
-   477                                                   Period((u'year', Instant((2010, 3, 1)), 1))
-   478                                           
-   479                                                   >>> period('day', '2014-1-30').offset(3)
-   480                                                   Period((u'day', Instant((2014, 2, 2)), 1))
-   481                                                   >>> period('month', '2014-1-30').offset(3)
-   482                                                   Period((u'month', Instant((2014, 4, 30)), 1))
-   483                                                   >>> period('year', '2014-1-30').offset(3)
-   484                                                   Period((u'year', Instant((2017, 1, 30)), 1))
-   485                                           
-   486                                                   >>> period('day', 2014).offset(-3)
-   487                                                   Period((u'day', Instant((2013, 12, 29)), 365))
-   488                                                   >>> period('month', 2014).offset(-3)
-   489                                                   Period((u'month', Instant((2013, 10, 1)), 12))
-   490                                                   >>> period('year', 2014).offset(-3)
-   491                                                   Period((u'year', Instant((2011, 1, 1)), 1))
-   492                                           
-   493                                                   >>> period('day', '2014-2-3').offset('first-of', 'month')
-   494                                                   Period((u'day', Instant((2014, 2, 1)), 1))
-   495                                                   >>> period('day', '2014-2-3').offset('first-of', 'year')
-   496                                                   Period((u'day', Instant((2014, 1, 1)), 1))
-   497                                           
-   498                                                   >>> period('day', '2014-2-3', 4).offset('first-of', 'month')
-   499                                                   Period((u'day', Instant((2014, 2, 1)), 4))
-   500                                                   >>> period('day', '2014-2-3', 4).offset('first-of', 'year')
-   501                                                   Period((u'day', Instant((2014, 1, 1)), 4))
-   502                                           
-   503                                                   >>> period('month', '2014-2-3').offset('first-of')
-   504                                                   Period((u'month', Instant((2014, 2, 1)), 1))
-   505                                                   >>> period('month', '2014-2-3').offset('first-of', 'month')
-   506                                                   Period((u'month', Instant((2014, 2, 1)), 1))
-   507                                                   >>> period('month', '2014-2-3').offset('first-of', 'year')
-   508                                                   Period((u'month', Instant((2014, 1, 1)), 1))
-   509                                           
-   510                                                   >>> period('month', '2014-2-3', 4).offset('first-of')
-   511                                                   Period((u'month', Instant((2014, 2, 1)), 4))
-   512                                                   >>> period('month', '2014-2-3', 4).offset('first-of', 'month')
-   513                                                   Period((u'month', Instant((2014, 2, 1)), 4))
-   514                                                   >>> period('month', '2014-2-3', 4).offset('first-of', 'year')
-   515                                                   Period((u'month', Instant((2014, 1, 1)), 4))
-   516                                           
-   517                                                   >>> period('year', 2014).offset('first-of')
-   518                                                   Period((u'year', Instant((2014, 1, 1)), 1))
-   519                                                   >>> period('year', 2014).offset('first-of', 'month')
-   520                                                   Period((u'year', Instant((2014, 1, 1)), 1))
-   521                                                   >>> period('year', 2014).offset('first-of', 'year')
-   522                                                   Period((u'year', Instant((2014, 1, 1)), 1))
-   523                                           
-   524                                                   >>> period('year', '2014-2-3').offset('first-of')
-   525                                                   Period((u'year', Instant((2014, 1, 1)), 1))
-   526                                                   >>> period('year', '2014-2-3').offset('first-of', 'month')
-   527                                                   Period((u'year', Instant((2014, 2, 1)), 1))
-   528                                                   >>> period('year', '2014-2-3').offset('first-of', 'year')
-   529                                                   Period((u'year', Instant((2014, 1, 1)), 1))
-   530                                           
-   531                                                   >>> period('day', '2014-2-3').offset('last-of', 'month')
-   532                                                   Period((u'day', Instant((2014, 2, 28)), 1))
-   533                                                   >>> period('day', '2014-2-3').offset('last-of', 'year')
-   534                                                   Period((u'day', Instant((2014, 12, 31)), 1))
-   535                                           
-   536                                                   >>> period('day', '2014-2-3', 4).offset('last-of', 'month')
-   537                                                   Period((u'day', Instant((2014, 2, 28)), 4))
-   538                                                   >>> period('day', '2014-2-3', 4).offset('last-of', 'year')
-   539                                                   Period((u'day', Instant((2014, 12, 31)), 4))
-   540                                           
-   541                                                   >>> period('month', '2014-2-3').offset('last-of')
-   542                                                   Period((u'month', Instant((2014, 2, 28)), 1))
-   543                                                   >>> period('month', '2014-2-3').offset('last-of', 'month')
-   544                                                   Period((u'month', Instant((2014, 2, 28)), 1))
-   545                                                   >>> period('month', '2014-2-3').offset('last-of', 'year')
-   546                                                   Period((u'month', Instant((2014, 12, 31)), 1))
-   547                                           
-   548                                                   >>> period('month', '2014-2-3', 4).offset('last-of')
-   549                                                   Period((u'month', Instant((2014, 2, 28)), 4))
-   550                                                   >>> period('month', '2014-2-3', 4).offset('last-of', 'month')
-   551                                                   Period((u'month', Instant((2014, 2, 28)), 4))
-   552                                                   >>> period('month', '2014-2-3', 4).offset('last-of', 'year')
-   553                                                   Period((u'month', Instant((2014, 12, 31)), 4))
-   554                                           
-   555                                                   >>> period('year', 2014).offset('last-of')
-   556                                                   Period((u'year', Instant((2014, 12, 31)), 1))
-   557                                                   >>> period('year', 2014).offset('last-of', 'month')
-   558                                                   Period((u'year', Instant((2014, 1, 31)), 1))
-   559                                                   >>> period('year', 2014).offset('last-of', 'year')
-   560                                                   Period((u'year', Instant((2014, 12, 31)), 1))
-   561                                           
-   562                                                   >>> period('year', '2014-2-3').offset('last-of')
-   563                                                   Period((u'year', Instant((2014, 12, 31)), 1))
-   564                                                   >>> period('year', '2014-2-3').offset('last-of', 'month')
-   565                                                   Period((u'year', Instant((2014, 2, 28)), 1))
-   566                                                   >>> period('year', '2014-2-3').offset('last-of', 'year')
-   567                                                   Period((u'year', Instant((2014, 12, 31)), 1))
-   568                                                   """
-   569   1587172   14090045.0      8.9    100.0          return self.__class__((self[0], self[1].offset(offset, self[0] if unit is None else unit), self[2]))
-
-Total time: 0.553681 s
-File: /Users/hyperion/Sites/dinsic/openfisca/openfisca-core/openfisca_core/periods.py
-Function: size_in_months at line 588
-
-Line #      Hits         Time  Per Hit   % Time  Line Contents
-==============================================================
-   588                                               @property
-   589                                               @profile
-   590                                               def size_in_months(self):
-   591                                                   """Return the size of the period in months.
-   592                                           
-   593                                                   >>> period('month', '2012-2-29', 4).size_in_months
-   594                                                   4
-   595                                                   >>> period('year', '2012', 1).size_in_months
-   596                                                   12
-   597                                                   """
-   598    618121     312162.0      0.5     56.4          if (self[0] == MONTH):
-   599    578088     219668.0      0.4     39.7              return self[2]
-   600                                                   else:
-   601     40033      21851.0      0.5      3.9              return self[2] * 12
-
-Total time: 2.77441 s
-File: /Users/hyperion/Sites/dinsic/openfisca/openfisca-core/openfisca_core/periods.py
-Function: start at line 603
-
-Line #      Hits         Time  Per Hit   % Time  Line Contents
-==============================================================
-   603                                               @property
-   604                                               @profile
-   605                                               def start(self):
-   606                                                   """Return the first day of the period as an Instant instance.
-   607                                           
-   608                                                   >>> period('month', '2012-2-29', 4).start
-   609                                                   Instant((2012, 2, 29))
-   610                                                   """
-   611   8370106    2774408.0      0.3    100.0          return self[1]
-
-Total time: 16.7777 s
-File: /Users/hyperion/Sites/dinsic/openfisca/openfisca-core/openfisca_core/periods.py
-Function: first_month at line 714
-
-Line #      Hits         Time  Per Hit   % Time  Line Contents
-==============================================================
-   714                                               @property
-   715                                               @profile
-   716                                               def first_month(self):
-   717   1587197   16777719.0     10.6    100.0          return self.start.offset('first-of', 'month').period('month')
-
-Total time: 17.8542 s
-File: /Users/hyperion/Sites/dinsic/openfisca/openfisca-core/openfisca_core/periods.py
-Function: period at line 777
-
-Line #      Hits         Time  Per Hit   % Time  Line Contents
-==============================================================
-   777                                           @profile
-   778                                           def period(value):
-   779                                               """Return a new period, aka a triple (unit, start_instant, size).
-   780                                           
-   781                                               >>> period(u'2014')
-   782                                               Period((YEAR, Instant((2014, 1, 1)), 1))
-   783                                               >>> period(u'year:2014')
-   784                                               Period((YEAR, Instant((2014, 1, 1)), 1))
-   785                                           
-   786                                               >>> period(u'2014-2')
-   787                                               Period((MONTH, Instant((2014, 2, 1)), 1))
-   788                                               >>> period(u'2014-02')
-   789                                               Period((MONTH, Instant((2014, 2, 1)), 1))
-   790                                               >>> period(u'month:2014-2')
-   791                                               Period((MONTH, Instant((2014, 2, 1)), 1))
-   792                                           
-   793                                               >>> period(u'year:2014-2')
-   794                                               Period((YEAR, Instant((2014, 2, 1)), 1))
-   795                                               """
-   796   5324186    5879685.0      1.1     32.9      if isinstance(value, Period):
-   797   5207267    4585475.0      0.9     25.7          return value
-   798                                           
-   799    116919     122362.0      1.0      0.7      def parse_simple_period(value):
-   800                                                   """
-   801                                                   Parses simple periods respecting the ISO format, such as 2012 or 2015-03
-   802                                                   """
-   803                                                   try:
-   804                                                       date = datetime.datetime.strptime(value, '%Y')
-   805                                                   except ValueError:
-   806                                                       try:
-   807                                                           date = datetime.datetime.strptime(value, '%Y-%m')
-   808                                                       except ValueError:
-   809                                                           return None
-   810                                                       else:
-   811                                                           return Period((MONTH, Instant((date.year, date.month, 1)), 1))
-   812                                                   else:
-   813                                                       return Period((YEAR, Instant((date.year, date.month, 1)), 1))
-   814                                           
-   815    116919     107124.0      0.9      0.6      def raise_error(value):
-   816                                                   message = linesep.join([
-   817                                                       u"Expected a period (eg. '2017', '2017-01', ...); got: '{}'.".format(value),
-   818                                                       u"Learn more about legal period formats in OpenFisca:",
-   819                                                       u"<http://openfisca.org/doc/periodsinstants.html#api>."
-   820                                                       ]).encode('utf-8')
-   821                                                   raise ValueError(message)
-   822                                           
-   823    116919     148188.0      1.3      0.8      if value == 'ETERNITY' or value == ETERNITY:
-   824     22839     227076.0      9.9      1.3          return Period((u'eternity', instant(datetime.date.min), float("inf")))
-   825                                           
-   826                                               # check the type
-   827     94080     107336.0      1.1      0.6      if isinstance(value, int):
-   828      1367       2686.0      2.0      0.0          return Period((YEAR, Instant((value, 1, 1)), 1))
-   829     92713      94914.0      1.0      0.5      if not isinstance(value, basestring_type):
-   830                                                   raise_error(value)
-   831                                           
-   832                                               # try to parse as a simple period
-   833     92713    6365910.0     68.7     35.7      period = parse_simple_period(value)
-   834     92713      94425.0      1.0      0.5      if period is not None:
-   835     92295      78771.0      0.9      0.4          return period
-   836                                           
-   837                                               # complex period must have a ':' in their strings
-   838       418        407.0      1.0      0.0      if ":" not in value:
-   839                                                   raise_error(value)
-   840                                           
-   841       418        887.0      2.1      0.0      components = value.split(':')
-   842                                           
-   843                                               # left-most component must be a valid unit
-   844       418        399.0      1.0      0.0      unit = components[0]
-   845       418        624.0      1.5      0.0      if unit not in (MONTH, YEAR):
-   846                                                   raise_error(value)
-   847                                           
-   848                                               # middle component must be a valid iso period
-   849       418      32932.0     78.8      0.2      base_period = parse_simple_period(components[1])
-   850       418        494.0      1.2      0.0      if not base_period:
-   851                                                   raise_error(value)
-   852                                           
-   853                                               # period like year:2015-03 have a size of 1
-   854       418        496.0      1.2      0.0      if len(components) == 2:
-   855       418        394.0      0.9      0.0          size = 1
-   856                                               # if provided, make sure the size is an integer
-   857                                               elif len(components) == 3:
-   858                                                   try:
-   859                                                       size = int(components[2])
-   860                                                   except ValueError:
-   861                                                       raise_error(value)
-   862                                               # if there is more than 2 ":" in the string, the period is invalid
-   863                                               else:
-   864                                                   raise_error(value)
-   865                                           
-   866                                               # reject ambiguous period such as month:2014
-   867       418       1086.0      2.6      0.0      if base_period.unit == YEAR and unit == MONTH:
-   868                                                   raise_error(value)
-   869                                           
-   870       418       2479.0      5.9      0.0      return Period((unit, base_period.start, size))
-
-Total time: 55.1934 s
-File: /Users/hyperion/Sites/dinsic/openfisca/openfisca-core/openfisca_core/periods.py
-Function: period at line 1108
-
-Line #      Hits         Time  Per Hit   % Time  Line Contents
-==============================================================
-  1108                                                   @wraps(fun)
-  1109                                                   def period(self, period, *args, **kwargs):
-  1110   5134324    2010680.0      0.4      3.6              if period is None:
-  1111                                                           pass
-  1112   5134324    2317342.0      0.5      4.2              if not self.is_eternal:
-  1113   5111485   39417097.0      7.7     71.4                  period = get_period(period)
-  1114                                                       else:
-  1115     22839     572422.0     25.1      1.0                  period = get_period(eternity)
-  1116                                           
-  1117   5134324   10875847.0      2.1     19.7              return fun(self, period, *args, **kwargs)
-
-Total time: 272.145 s
+Total time: 27.0734 s
 File: /Users/hyperion/Sites/dinsic/openfisca/openfisca-core/openfisca_core/simulations.py
-Function: calculate at line 132
+Function: _check_period_consistency at line 275
 
 Line #      Hits         Time  Per Hit   % Time  Line Contents
 ==============================================================
-   132                                               @profile
-   133                                               def calculate(self, variable_name, period, **parameters):
-   134                                                   """
-   135                                                       Calculate the variable ``variable_name`` for the period ``period``, using the variable formula if it exists.
-   136                                           
-   137                                                       :returns: A numpy array containing the result of the calculation
-   138                                                   """
-   139   3504965   22115853.0      6.3      8.1          entity = self.get_variable_entity(variable_name)
-   140   3504965   40268837.0     11.5     14.8          holder = entity.get_holder(variable_name)
-   141   3504965    5665200.0      1.6      2.1          variable = self.tax_benefit_system.get_variable(variable_name)
-   142                                           
-   143   3504965    3030196.0      0.9      1.1          if period is not None and not isinstance(period, periods.Period):
-   144                                                       period = periods.period(period)
-   145                                           
-   146   3504965    2043964.0      0.6      0.8          if self.trace:
-   147                                                       self.tracer.record_calculation_start(variable.name, period, **parameters)
-   148                                           
-   149   3504965   12650511.0      3.6      4.6          self._check_period_consistency(period, variable)
-   150                                           
-   151   3504965    2439119.0      0.7      0.9          extra_params = parameters.get('extra_params', ())
-   152                                           
-   153                                                   # First look for a value already cached
-   154   3504965   71585113.0     20.4     26.3          cached_array = holder.get_array(period, extra_params)
-   155   3504965    2027837.0      0.6      0.7          if cached_array is not None:
-   156   2314388    1406843.0      0.6      0.5              if self.trace:
-   157                                                           self.tracer.record_calculation_end(variable.name, period, cached_array, **parameters)
-   158   2314388    1142369.0      0.5      0.4              return cached_array
-   159                                           
-   160   1190577     846870.0      0.7      0.3          max_nb_cycles = parameters.get('max_nb_cycles')
-   161   1190577     641979.0      0.5      0.2          if max_nb_cycles is not None:
-   162     14238       9845.0      0.7      0.0              self.max_nb_cycles = max_nb_cycles
-   163                                           
-   164                                                   # First, try to run a formula
-   165   1190577   38460539.0     32.3     14.1          array = self._run_formula(variable, entity, period, extra_params, max_nb_cycles)
-   166                                           
-   167                                                   # If no result, try a base function
-   168   1190171     911858.0      0.8      0.3          if array is None and variable.base_function:
-   169    147570   15628715.0    105.9      5.7              array = variable.base_function(holder, period, *extra_params)
-   170                                           
-   171                                                   # If no result, use the default value
-   172   1190171     690934.0      0.6      0.3          if array is None:
-   173    411852    2530745.0      6.1      0.9              array = holder.default_array()
-   174                                           
-   175   1190171    3113562.0      2.6      1.1          self._clean_cycle_detection_data(variable.name)
-   176   1190171     691130.0      0.6      0.3          if max_nb_cycles is not None:
-   177     14238      12277.0      0.9      0.0              self.max_nb_cycles = None
-   178                                           
-   179   1190171   42819271.0     36.0     15.7          holder.put_in_cache(array, period, extra_params)
-   180   1190171     795171.0      0.7      0.3          if self.trace:
-   181                                                       self.tracer.record_calculation_end(variable.name, period, array, **parameters)
-   182                                           
-   183   1190171     616074.0      0.5      0.2          return array
+   275                                               @profile
+   276                                               def _check_period_consistency(self, period, variable):
+   277                                                   """
+   278                                                       Check that a period matches the variable definition_period
+   279                                                   """
+   280   7597923    5155722.0      0.7     19.0          if variable.definition_period == periods.ETERNITY:
+   281     39388      16315.0      0.4      0.1              return  # For variables which values are constant in time, all periods are accepted
+   282                                           
+   283   7558535    9450901.0      1.3     34.9          if variable.definition_period == periods.MONTH and period.unit != periods.MONTH:
+   284                                                       raise ValueError(u'Unable to compute variable {0} for period {1} : {0} must be computed for a whole month. You can use the ADD option to sum {0} over the requested period, or change the requested period to "period.first_month".'.format(
+   285                                                           variable.name,
+   286                                                           period
+   287                                                           ).encode('utf-8'))
+   288                                           
+   289   7558535    4909071.0      0.6     18.1          if variable.definition_period == periods.YEAR and period.unit != periods.YEAR:
+   290                                                       raise ValueError(u'Unable to compute variable {0} for period {1} : {0} must be computed for a whole year. You can use the DIVIDE option to get an estimate of {0} by dividing the yearly value by 12, or change the requested period to "period.this_year".'.format(
+   291                                                           variable.name,
+   292                                                           period
+   293                                                           ).encode('utf-8'))
+   294                                           
+   295   7558535    7541357.0      1.0     27.9          if period.size != 1:
+   296                                                       raise ValueError(u'Unable to compute variable {0} for period {1} : {0} must be computed for a whole {2}. You can use the ADD option to sum {0} over the requested period.'.format(
+   297                                                           variable.name,
+   298                                                           period,
+   299                                                           'month' if variable.definition_period == periods.MONTH else 'year'
+   300                                                           ).encode('utf-8'))
 
-Total time: 239.87 s
-File: /Users/hyperion/Sites/dinsic/openfisca/openfisca-core/openfisca_core/simulations.py
-Function: calculate_add at line 185
+Total time: 42.3197 s
+File: /Users/hyperion/Sites/dinsic/openfisca/openfisca-core/openfisca_core/taxbenefitsystems.py
+Function: get_variable at line 250
 
 Line #      Hits         Time  Per Hit   % Time  Line Contents
 ==============================================================
-   185                                               @profile
-   186                                               def calculate_add(self, variable_name, period, **parameters):
-   187    623837    1184130.0      1.9      0.5          variable = self.tax_benefit_system.get_variable(variable_name)
-   188                                           
-   189    623837     593123.0      1.0      0.2          if period is not None and not isinstance(period, periods.Period):
-   190                                                       period = periods.period(period)
-   191                                           
-   192                                                   # Check that the requested period matches definition_period
-   193    623837     550890.0      0.9      0.2          if variable.definition_period == periods.YEAR and period.unit == periods.MONTH:
-   194                                                       raise ValueError(u'Unable to compute variable {0} for period {1} : {0} can only be computed for year-long periods. You can use the DIVIDE option to get an estimate of {0} by dividing the yearly value by 12, or change the requested period to "period.this_year".'.format(
-   195                                                           variable.name,
-   196                                                           period,
-   197                                                           ).encode('utf-8'))
-   198                                           
-   199    623837     702719.0      1.1      0.3          if variable.definition_period not in [periods.MONTH, periods.YEAR]:
-   200                                                       raise ValueError(u'Unable to sum constant variable {} over period {} : only variables defined monthly or yearly can be summed over time.'.format(
-   201                                                           variable.name,
-   202                                                           period).encode('utf-8'))
-   203                                           
-   204    623837     377482.0      0.6      0.2          return sum(
-   205    623837     549123.0      0.9      0.2              self.calculate(variable_name, sub_period, **parameters)
-   206    623837  235912134.0    378.2     98.4              for sub_period in period.get_subperiods(variable.definition_period)
-   207                                                       )
+   250                                               @profile
+   251                                               def get_variable(self, variable_name, check_existence = False):
+   252                                                   """
+   253                                                   Get a variable from the tax and benefit system.
+   254                                           
+   255                                                   :param variable_name: Name of the requested variable.
+   256                                                   :param check_existence: If True, raise an error if the requested variable does not exist.
+   257                                                   """
+   258  31011729   22564014.0      0.7     53.3          variables = self.variables.get(variable_name)
+   259  31011729   10749659.0      0.3     25.4          if not variables and check_existence:
+   260                                                       raise VariableNotFound(variable_name, self)
+   261  31011729    9006020.0      0.3     21.3          return variables
 
-Total time: 242.147 s
-File: /Users/hyperion/Sites/dinsic/openfisca/openfisca-core/openfisca_core/simulations.py
-Function: _run_formula at line 246
+Total time: 118.584 s
+File: /Users/hyperion/Sites/dinsic/openfisca/openfisca-core/openfisca_core/taxscales.py
+Function: calc at line 190
 
 Line #      Hits         Time  Per Hit   % Time  Line Contents
 ==============================================================
-   246                                               @profile
-   247                                               def _run_formula(self, variable, entity, period, extra_params, max_nb_cycles):
-   248                                                   """
-   249                                                       Find the ``variable`` formula for the given ``period`` if it exists, and apply it to ``entity``.
-   250                                                   """
-   251                                           
-   252   1190577   10498669.0      8.8      4.3          formula = variable.get_formula(period)
-   253   1190577     647083.0      0.5      0.3          if formula is None:
-   254    550518     242412.0      0.4      0.1              return None
-   255    640059     411373.0      0.6      0.2          parameters_at = self.tax_benefit_system.get_parameters_at_instant
-   256    640059     286225.0      0.4      0.1          try:
-   257    640059    2907198.0      4.5      1.2              self._check_for_cycle(variable, period)
-   258    639978     668747.0      1.0      0.3              if formula.__code__.co_argcount == 2:
-   259     78413   14759961.0    188.2      6.1                  array = formula(entity, period)
-   260                                                       else:
-   261    561565  207465519.0    369.4     85.7                  array = formula(entity, period, parameters_at, *extra_params)
-   262       487        344.0      0.7      0.0          except CycleError as error:
-   263       487       1312.0      2.7      0.0              self._clean_cycle_detection_data(variable.name)
-   264       487        253.0      0.5      0.0              if max_nb_cycles is None:
-   265       406        217.0      0.5      0.0                  if self.trace:
-   266                                                               self.tracer.record_calculation_abortion(variable.name, period, extra_params = extra_params)
-   267                                                           # Re-raise until reaching the first variable called with max_nb_cycles != None in the stack.
-   268       406        242.0      0.6      0.0                  raise error
-   269        81         61.0      0.8      0.0              self.max_nb_cycles = None
-   270        81         37.0      0.5      0.0              return None
-   271                                           
-   272    639572    2144132.0      3.4      0.9          self._check_formula_result(array, variable, entity, period)
-   273    639572    2113040.0      3.3      0.9          return self._cast_formula_result(array, variable)
-
-Total time: 10.8365 s
-File: /Users/hyperion/Sites/dinsic/openfisca/openfisca-core/openfisca_core/simulations.py
-Function: get_variable_entity at line 418
-
-Line #      Hits         Time  Per Hit   % Time  Line Contents
-==============================================================
-   418                                               @profile
-   419                                               def get_variable_entity(self, variable_name):
-   420                                           
-   421   3600323    5960167.0      1.7     55.0          variable = self.tax_benefit_system.get_variable(variable_name, check_existence = True)
-   422   3600323    4876291.0      1.4     45.0          return self.get_entity(variable.entity)
+   190                                               @profile
+   191                                               def calc(self, base, factor = 1, round_base_decimals = None):
+   192   1133580   20110278.0     17.7     17.0          base1 = np.tile(base, (len(self.thresholds), 1)).T
+   193   1133580    1653437.0      1.5      1.4          if isinstance(factor, (float, int)):
+   194    101179     856322.0      8.5      0.7              factor = np.ones(len(base)) * factor
+   195                                                   # np.finfo(np.float).eps is used to avoid np.nan = 0 * np.inf creation
+   196   1133580   24025401.0     21.2     20.3          thresholds1 = np.outer(factor + np.finfo(np.float).eps, np.array(self.thresholds + [np.inf]))
+   197   1133580     810657.0      0.7      0.7          if round_base_decimals is not None:
+   198   1072039   11778381.0     11.0      9.9              thresholds1 = np.round(thresholds1, round_base_decimals)
+   199   1133580    9143424.0      8.1      7.7          a = max_(min_(base1, thresholds1[:, 1:]) - thresholds1[:, :-1], 0)
+   200   1133580     710445.0      0.6      0.6          if round_base_decimals is None:
+   201     61541     265921.0      4.3      0.2              return np.dot(self.rates, a.T)
+   202                                                   else:
+   203   1072039   23446210.0     21.9     19.8              r = np.tile(self.rates, (len(base), 1))
+   204   1072039   10104201.0      9.4      8.5              b = np.round(a, round_base_decimals)
+   205   1072039   15679365.0     14.6     13.2              return np.round(r * b, round_base_decimals).sum(axis = 1)
 
