@@ -1861,11 +1861,60 @@ class plafonnement_niches_fiscales(Variable):
 
     def formula(foyer_fiscal, period, parameters):
         '''
-        Plafonnement global des niches fiscales
+        Plafonnement global des niches fiscales (pas de plafonnement avant 2009)
         '''
 
         return 0
+
+    def formula_2009_01_01(foyer_fiscal, period, parameters):
+        '''
+        Plafonnement global des niches fiscales de 2009 à 2012 #TODO
+        '''
+
+        return 0 # TODO
+
+    def formula_2013_01_01(foyer_fiscal, period, parameters):
+        '''
+        Plafonnement global des niches fiscales depuis 2013
+        '''
+        assloy = foyer_fiscal('assloy', period)
+        cappme = foyer_fiscal('cappme', period)
+        ci_garext = foyer_fiscal('ci_garext', period)
+        doment = foyer_fiscal('doment', period) # TODO : normalement plafonnement selon les règles de l'année d'initialisation de l'investissement et non de réalisation ..
+        domlog = foyer_fiscal('domlog', period) # TODO : normalement plafonnement selon les règles de l'année d'initialisation de l'investissement et non de réalisation ..
+        domsoc = foyer_fiscal('domsoc', period) # TODO : normalement plafonnement selon les règles de l'année d'initialisation de l'investissement et non de réalisation ..
+        duflot = foyer_fiscal('duflot', period)
+        inthab = foyer_fiscal('inthab', period)
+        invfor = foyer_fiscal('invfor', period)
+        invlst = foyer_fiscal('invlst', period)
+        locmeu = foyer_fiscal('locmeu', period) # TODO : normalement plafonnement selon les règles de l'année d'initialisation de l'investissement et non de réalisation ..
+        mohist = foyer_fiscal('mohist', period)
+        patnat = foyer_fiscal('patnat', period)
+        quaenv = foyer_fiscal('quaenv', period)
+        resimm = foyer_fiscal('resimm', period) # TODO : normalement plafonnement selon les règles de l'année d'initialisation de l'investissement et non de réalisation ..
+        rpinel = foyer_fiscal('rpinel', period)
+        saldom = foyer_fiscal('saldom', period)
+        saldom2 = foyer_fiscal('saldom2', period)
+        scelli = foyer_fiscal('scelli', period) # TODO : normalement plafonnement selon les règles de l'année d'initialisation de l'investissement et non de réalisation ..
+        sofica = foyer_fiscal('sofica', period)
+        spfcpi = foyer_fiscal('spfcpi', period)
+        P = parameters(period).impot_revenu.plaf_nich
+
+        avantages_fiscaux_plafond_simple = (
+            assloy + cappme + ci_garext + duflot + inthab + invfor + invlst + locmeu
+            + mohist + patnat + quaenv + resimm + rpinel + saldom + saldom2 + scelli
+            + spfcpi
+            )
+
+        avantages_fiscaux_plafond_majore = (
+            doment + domlog + domsoc + sofica
+            )
         
+        depassement_plafond_simple = max_(0, avantages_fiscaux_plafond_simple - P.plafond)
+        depassement_plafond_majore = max_(0, min_(P.plafond, avantages_fiscaux_plafond_simple) + avantages_fiscaux_plafond_majore - P.plafond - P.majoration)
+
+        return depassement_plafond_simple + depassement_plafond_majore
+    
 
 class irpp(Variable):
     value_type = float
