@@ -1852,6 +1852,21 @@ class cehr(Variable):
         # TODO: Gérer le II.-1 du lissage interannuel ? (problème de non recours)
 
 
+class plafonnement_niches_fiscales(Variable):
+    value_type = float
+    entity = FoyerFiscal
+    label = u"Dépassement du plafond global des niches fiscales (à ajouter à l'impôt dû)"
+    reference = ""
+    definition_period = YEAR
+
+    def formula(foyer_fiscal, period, parameters):
+        '''
+        Plafonnement global des niches fiscales
+        '''
+
+        return 0
+        
+
 class irpp(Variable):
     value_type = float
     entity = FoyerFiscal
@@ -1866,9 +1881,10 @@ class irpp(Variable):
         iai = foyer_fiscal('iai', period)
         credits_impot = foyer_fiscal('credits_impot', period)
         cehr = foyer_fiscal('cehr', period)
+        plafonnement_niches_fiscales = foyer_fiscal('plafonnement_niches_fiscales', period)
         P = parameters(period).impot_revenu.recouvrement
 
-        pre_result = iai - credits_impot + cehr
+        pre_result = iai - credits_impot + cehr + plafonnement_niches_fiscales
 
         return (
             (iai > P.seuil) * (
