@@ -1856,8 +1856,14 @@ class plafonnement_niches_fiscales(Variable):
     value_type = float
     entity = FoyerFiscal
     label = u"Dépassement du plafond global des niches fiscales (à ajouter à l'impôt dû)"
-    reference = ""
+    reference = "http://bofip.impots.gouv.fr/bofip/7249-PGP"
     definition_period = YEAR
+
+    # NB : Dans les faits, l'administration procède à une double liquidation de l'IR afin d'appliquer le plafonnement,
+    # c'est-à-dire qu'elle calcule l'impôt selon les règles normales puis l'impôt sans les avantages fiscaux plafonnés.
+    # Si le montant de la différence de ces deux impôts dépasse le plafond, alors il est rajouté à l'impôt dû par le 
+    # contribuable. Etant donné la complexité de cette opération, on se contente de plafonner le montant des réductions
+    # et crédits (on fait donc abstraction du plafonnement des charges déductibles).
 
     def formula(foyer_fiscal, period, parameters):
         '''
