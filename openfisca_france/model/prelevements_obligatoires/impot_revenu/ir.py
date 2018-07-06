@@ -1917,7 +1917,11 @@ class plafonnement_niches_fiscales(Variable):
         depassement_plafond_majore = max_(0, min_(plafond_simple, avantages_fiscaux_plafond_simple) + avantages_fiscaux_plafond_majore - plafond_majore)
 
         return depassement_plafond_simple + depassement_plafond_majore
-    
+
+        # TODO : Réduction pour investissement Outre-Mer dans le cadre d'une entreprise ("doment") : seule la partie de la réduction non rétrocédée à l'entreprise est retenue pour application du plafond
+        # TODO : Réduction pour investisement Malraux ("resimm") : exclue du plafonnement pour les opérations engagées à compter de 2013
+        # TODO : Report possible sur 5 ans de la fraction de la réduction pour investissement dans PME ("cappme") qui dépasse le plafond
+
 
 class irpp(Variable):
     value_type = float
