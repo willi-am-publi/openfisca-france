@@ -1874,14 +1874,7 @@ class plafonnement_niches_fiscales(Variable):
 
     def formula_2009_01_01(foyer_fiscal, period, parameters):
         '''
-        Plafonnement global des niches fiscales de 2009 à 2012 #TODO
-        '''
-
-        return 0 # TODO
-
-    def formula_2013_01_01(foyer_fiscal, period, parameters):
-        '''
-        Plafonnement global des niches fiscales depuis 2013
+        Plafonnement global des niches fiscales depuis 2009
         '''
         assloy = foyer_fiscal('assloy', period)
         cappme = foyer_fiscal('cappme', period)
@@ -1904,6 +1897,7 @@ class plafonnement_niches_fiscales(Variable):
         scelli = foyer_fiscal('scelli', period) # TODO : normalement plafonnement selon les règles de l'année d'initialisation de l'investissement et non de réalisation ..
         sofica = foyer_fiscal('sofica', period)
         spfcpi = foyer_fiscal('spfcpi', period)
+        rni = foyers_fiscal('rni', period)
         P = parameters(period).impot_revenu.plaf_nich
 
         avantages_fiscaux_plafond_simple = (
@@ -1915,9 +1909,12 @@ class plafonnement_niches_fiscales(Variable):
         avantages_fiscaux_plafond_majore = (
             doment + domlog + domsoc + sofica
             )
+
+        plafond_simple = P.plafond + P.taux * rni
+        plafond_majore = plafond_simple + P.majoration
         
-        depassement_plafond_simple = max_(0, avantages_fiscaux_plafond_simple - P.plafond)
-        depassement_plafond_majore = max_(0, min_(P.plafond, avantages_fiscaux_plafond_simple) + avantages_fiscaux_plafond_majore - P.plafond - P.majoration)
+        depassement_plafond_simple = max_(0, avantages_fiscaux_plafond_simple - plafond_simple)
+        depassement_plafond_majore = max_(0, min_(plafond_simple, avantages_fiscaux_plafond_simple) + avantages_fiscaux_plafond_majore - plafond_majore)
 
         return depassement_plafond_simple + depassement_plafond_majore
     
