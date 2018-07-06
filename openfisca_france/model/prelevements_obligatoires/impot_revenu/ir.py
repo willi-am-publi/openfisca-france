@@ -1897,7 +1897,7 @@ class plafonnement_niches_fiscales(Variable):
         scelli = foyer_fiscal('scelli', period) # TODO : normalement plafonnement selon les règles de l'année d'initialisation de l'investissement et non de réalisation ..
         sofica = foyer_fiscal('sofica', period)
         spfcpi = foyer_fiscal('spfcpi', period)
-        rni = foyers_fiscal('rni', period)
+        rni = foyer_fiscal('rni', period)
         P = parameters(period).impot_revenu.plaf_nich
 
         avantages_fiscaux_plafond_simple = (
