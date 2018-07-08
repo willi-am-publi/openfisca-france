@@ -1,191 +1,65 @@
 Timer unit: 1e-06 s
 
-Total time: 0 s
-File: /Users/hyperion/Sites/dinsic/openfisca/openfisca-core/openfisca_core/data_storage.py
-Function: get_memory_usage at line 59
+Total time: 264.966 s
+File: /Users/hyperion/Sites/dinsic/openfisca/openfisca-core/openfisca_core/simulations.py
+Function: calculate at line 132
 
 Line #      Hits         Time  Per Hit   % Time  Line Contents
 ==============================================================
-    59                                               @profile
-    60                                               def get_memory_usage(self):
-    61                                                   if not self._arrays:
-    62                                                       return dict(nb_arrays=0,
-    63                                                                   total_nb_bytes=0,
-    64                                                                   cell_size=np.nan)
-    65
-    66                                                   nb_arrays = sum([
-    67                                                       len(array_or_dict) if isinstance(array_or_dict, dict) else 1
-    68                                                       for array_or_dict in self._arrays.values()])
-    69
-    70                                                   array = next(iter(self._arrays.values()))
-    71                                                   if isinstance(array, dict):
-    72                                                       array = array.values()[0]
-    73                                                   return dict(nb_arrays=nb_arrays,
-    74                                                               total_nb_bytes=array.nbytes * nb_arrays,
-    75                                                               cell_size=array.itemsize)
+   132                                               @profile
+   133                                               def calculate(self, variable_name, period, **parameters):
+   134                                                   """
+   135                                                       Calculate the variable ``variable_name`` for the period ``period``, using the variable formula if it exists.
+   136
+   137                                                       :returns: A numpy array containing the result of the calculation
+   138                                                   """
+   139   7588195   23639782.0      3.1      8.9          entity = self.get_variable_entity(variable_name)
+   140   7588195   32359714.0      4.3     12.2          holder = entity.get_holder(variable_name)
+   141   7588195   10646990.0      1.4      4.0          variable = self.tax_benefit_system.get_variable(variable_name)
+   142
+   143   7588195    5678577.0      0.7      2.1          if period is not None and not isinstance(period, periods.Period):
+   144                                                       period = periods.period(period)
+   145
+   146   7588195    3934447.0      0.5      1.5          if self.trace:
+   147                                                       self.tracer.record_calculation_start(variable.name, period, **parameters)
+   148
+   149   7588195   24755206.0      3.3      9.3          self._check_period_consistency(period, variable)
+   150
+   151   7588195    4764665.0      0.6      1.8          extra_params = parameters.get('extra_params', ())
+   152
+   153                                                   # First look for a value already cached
+   154   7588195   47661832.0      6.3     18.0          cached_array = holder.get_array(period, extra_params)
+   155   7588195    3853281.0      0.5      1.5          if cached_array is not None:
+   156   5005022    2662683.0      0.5      1.0              if self.trace:
+   157                                                           self.tracer.record_calculation_end(variable.name, period, cached_array, **parameters)
+   158   5005022    2183851.0      0.4      0.8              return cached_array
+   159
+   160   2583173    1592859.0      0.6      0.6          max_nb_cycles = parameters.get('max_nb_cycles')
+   161   2583173    1270174.0      0.5      0.5          if max_nb_cycles is not None:
+   162     32559      20506.0      0.6      0.0              self.max_nb_cycles = max_nb_cycles
+   163
+   164                                                   # First, try to run a formula
+   165   2583173   44079593.0     17.1     16.6          array = self._run_formula(variable, entity, period, extra_params, max_nb_cycles)
+   166
+   167                                                   # If no result, try a base function
+   168   2581896    1858588.0      0.7      0.7          if array is None and variable.base_function:
+   169    312600   10811412.0     34.6      4.1              array = variable.base_function(holder, period, *extra_params)
+   170
+   171                                                   # If no result, use the default value
+   172   2581896    1365077.0      0.5      0.5          if array is None:
+   173    940999    4806254.0      5.1      1.8              array = holder.default_array()
+   174
+   175   2581896    5886031.0      2.3      2.2          self._clean_cycle_detection_data(variable.name)
+   176   2581896    1351632.0      0.5      0.5          if max_nb_cycles is not None:
+   177     32559      24817.0      0.8      0.0              self.max_nb_cycles = None
+   178
+   179   2581896   27064139.0     10.5     10.2          holder.put_in_cache(array, period, extra_params)
+   180   2581896    1547115.0      0.6      0.6          if self.trace:
+   181                                                       self.tracer.record_calculation_end(variable.name, period, array, **parameters)
+   182
+   183   2581896    1146941.0      0.4      0.4          return array
 
-Total time: 0 s
-File: /Users/hyperion/Sites/dinsic/openfisca/openfisca-core/openfisca_core/entities.py
-Function: get_memory_usage at line 249
-
-Line #      Hits         Time  Per Hit   % Time  Line Contents
-==============================================================
-   249                                               @profile
-   250                                               def get_memory_usage(self, variables = None):
-   251                                                   holders_memory_usage = {
-   252                                                       variable_name: holder.get_memory_usage()
-   253                                                       for variable_name, holder in self._holders.items()
-   254                                                       if variables is None or variable_name in variables
-   255                                                       }
-   256
-   257                                                   total_memory_usage = sum(
-   258                                                       holder_memory_usage['total_nb_bytes'] for holder_memory_usage in holders_memory_usage.values()
-   259                                                       )
-   260
-   261                                                   return dict(
-   262                                                       total_nb_bytes = total_memory_usage,
-   263                                                       by_variable = holders_memory_usage
-   264                                                       )
-
-Total time: 2.38271 s
-File: /Users/hyperion/Sites/dinsic/openfisca/openfisca-core/openfisca_core/entities.py
-Function: sum at line 503
-
-Line #      Hits         Time  Per Hit   % Time  Line Contents
-==============================================================
-   503                                               @profile
-   504                                               @projectable
-   505                                               def sum(self, array, role = None):
-   506                                                   """
-   507                                                       Return the sum of ``array`` for the members of the entity.
-   508
-   509                                                       ``array`` must have the dimension of the number of persons in the simulation
-   510
-   511                                                       If ``role`` is provided, only the entity member with the given role are taken into account.
-   512
-   513                                                       Example:
-   514
-   515                                                       >>> salaries = household.members('salary', '2018-01')  # e.g. [2000, 1500, 0, 0, 0]
-   516                                                       >>> household.sum(salaries)
-   517                                                       >>> array([3500])
-   518                                                   """
-   519    203756     260624.0      1.3     10.9          self.check_role_validity(role)
-   520    203756     323470.0      1.6     13.6          self.simulation.persons.check_array_compatible_with_entity(array)
-   521    203756      87218.0      0.4      3.7          if role is not None:
-   522     46389     927789.0     20.0     38.9              role_filter = self.members.has_role(role)
-   523     46389      32583.0      0.7      1.4              return np.bincount(
-   524     46389      79946.0      1.7      3.4                  self.members_entity_id[role_filter],
-   525     46389      37100.0      0.8      1.6                  weights = array[role_filter],
-   526     46389     162795.0      3.5      6.8                  minlength = self.count)
-   527                                                   else:
-   528    157367     471190.0      3.0     19.8              return np.bincount(self.members_entity_id, weights = array)
-
-Total time: 1.64727 s
-File: /Users/hyperion/Sites/dinsic/openfisca/openfisca-core/openfisca_core/entities.py
-Function: any at line 530
-
-Line #      Hits         Time  Per Hit   % Time  Line Contents
-==============================================================
-   530                                               @profile
-   531                                               @projectable
-   532                                               def any(self, array, role = None):
-   533                                                   """
-   534                                                       Return ``True`` if ``array`` is ``True`` for any members of the entity.
-   535
-   536                                                       ``array`` must have the dimension of the number of persons in the simulation
-   537
-   538                                                       If ``role`` is provided, only the entity member with the given role are taken into account.
-   539
-   540                                                       Example:
-   541
-   542                                                       >>> salaries = household.members('salary', '2018-01')  # e.g. [2000, 1500, 0, 0, 0]
-   543                                                       >>> household.any(salaries >= 1800)
-   544                                                       >>> array([True])
-   545                                                   """
-   546     99139    1378285.0     13.9     83.7          sum_in_entity = self.sum(array, role = role)
-   547     99139     268985.0      2.7     16.3          return (sum_in_entity > 0)
-
-Total time: 0.373563 s
-File: /Users/hyperion/Sites/dinsic/openfisca/openfisca-core/openfisca_core/entities.py
-Function: nb_persons at line 621
-
-Line #      Hits         Time  Per Hit   % Time  Line Contents
-==============================================================
-   621                                               @profile
-   622                                               @projectable
-   623                                               def nb_persons(self, role = None):
-   624                                                   """
-   625                                                       Returns the number of persons contained in the entity.
-   626
-   627                                                       If ``role`` is provided, only the entity member with the given role are taken into account.
-   628                                                   """
-   629     22368      14906.0      0.7      4.0          if role:
-   630      7395     235663.0     31.9     63.1              role_condition = self.members.has_role(role)
-   631      7395      92031.0     12.4     24.6              return self.sum(role_condition)
-   632                                                   else:
-   633     14973      30963.0      2.1      8.3              return np.bincount(self.members_entity_id)
-
-Total time: 0.00099 s
-File: /Users/hyperion/Sites/dinsic/openfisca/openfisca-core/openfisca_core/entities.py
-Function: build_entity at line 816
-
-Line #      Hits         Time  Per Hit   % Time  Line Contents
-==============================================================
-   816                                           @profile
-   817                                           def build_entity(key, plural, label, doc = "", roles = None, is_person = False):
-   818         4        228.0     57.0     23.0      entity_class_name = key.title()
-   819         4        437.0    109.2     44.1      attributes = {'key': key, 'plural': plural, 'label': label, 'doc': textwrap.dedent(doc), 'roles_description': roles}
-   820         4          3.0      0.8      0.3      if is_person:
-   821         1         22.0     22.0      2.2          entity_class = type(entity_class_name, (PersonEntity,), attributes)
-   822         3          4.0      1.3      0.4      elif roles:
-   823         3         83.0     27.7      8.4          entity_class = type(entity_class_name, (GroupEntity,), attributes)
-   824         3          4.0      1.3      0.4          entity_class.roles = []
-   825        11         10.0      0.9      1.0          for role_description in roles:
-   826         8         77.0      9.6      7.8              role = Role(role_description, entity_class)
-   827         8          9.0      1.1      0.9              entity_class.roles.append(role)
-   828         8         19.0      2.4      1.9              setattr(entity_class, role.key.upper(), role)
-   829         8          8.0      1.0      0.8              if role_description.get('subroles'):
-   830         2          2.0      1.0      0.2                  role.subroles = []
-   831         6          4.0      0.7      0.4                  for subrole_key in role_description['subroles']:
-   832         4         39.0      9.8      3.9                      subrole = Role({'key': subrole_key, 'max': 1}, entity_class)
-   833         4          9.0      2.2      0.9                      setattr(entity_class, subrole.key.upper(), subrole)
-   834         4          4.0      1.0      0.4                      role.subroles.append(subrole)
-   835         2          3.0      1.5      0.3                  role.max = len(role.subroles)
-   836        11         21.0      1.9      2.1          entity_class.flattened_roles = sum([role2.subroles or [role2] for role2 in entity_class.roles], [])
-   837
-   838         4          4.0      1.0      0.4      return entity_class
-
-Total time: 0.283956 s
-File: /Users/hyperion/Sites/dinsic/openfisca/openfisca-core/openfisca_core/json_to_test_case.py
-Function: check_each_person_has_entities at line 142
-
-Line #      Hits         Time  Per Hit   % Time  Line Contents
-==============================================================
-   142                                           @profile
-   143                                           def check_each_person_has_entities(test_case, tax_benefit_system, state):
-   144       731     280697.0    384.0     98.9      groupless_persons = check_entities_consistency(test_case, tax_benefit_system, state)[2]
-   145       731       1735.0      2.4      0.6      groupless_persons_ids = sum(groupless_persons.values(), [])  # all the persons who are missing an entity
-   146       731        490.0      0.7      0.2      error = None
-   147       731        526.0      0.7      0.2      if groupless_persons_ids:
-   148                                                   individu_index_by_id = {
-   149                                                       individu[u'id']: individu_index
-   150                                                       for individu_index, individu in enumerate(test_case[tax_benefit_system.person_entity.plural])
-   151                                                       }
-   152                                                   error = {}
-   153                                                   for person_id in groupless_persons_ids:
-   154                                                       error.setdefault(tax_benefit_system.person_entity.plural, {})[individu_index_by_id[person_id]] = state._(
-   155                                                           u"Individual is missing from {}").format(
-   156                                                               state._(u' & ').join(
-   157                                                                   word
-   158                                                                   for word in [
-   159                                                                       entity.plural if person_id in groupless_persons[entity.plural] else None
-   160                                                                       for entity in tax_benefit_system.group_entities
-   161                                                                       ]
-   162                                                                   if word is not None
-   163                                                                   ))
-   164       731        508.0      0.7      0.2      return test_case, error
-
-Total time: 260.342 s
+Total time: 291.873 s
 File: /Users/hyperion/Sites/dinsic/openfisca/openfisca-core/openfisca_core/simulations.py
 Function: calculate_add at line 185
 
@@ -193,48 +67,48 @@ Line #      Hits         Time  Per Hit   % Time  Line Contents
 ==============================================================
    185                                               @profile
    186                                               def calculate_add(self, variable_name, period, **parameters):
-   187   1347780    2648305.0      2.0      1.0          variable = self.tax_benefit_system.get_variable(variable_name)
+   187   1345881    2365351.0      1.8      0.8          variable = self.tax_benefit_system.get_variable(variable_name)
    188
-   189   1347780    1255175.0      0.9      0.5          if period is not None and not isinstance(period, periods.Period):
+   189   1345881    1136977.0      0.8      0.4          if period is not None and not isinstance(period, periods.Period):
    190                                                       period = periods.period(period)
    191
    192                                                   # Check that the requested period matches definition_period
-   193   1347780    1129057.0      0.8      0.4          if variable.definition_period == periods.YEAR and period.unit == periods.MONTH:
+   193   1345881    1056890.0      0.8      0.4          if variable.definition_period == periods.YEAR and period.unit == periods.MONTH:
    194                                                       raise ValueError(u'Unable to compute variable {0} for period {1} : {0} can only be computed for year-long periods. You can use the DIVIDE option to get an estimate of {0} by dividing the yearly value by 12, or change the requested period to "period.this_year".'.format(
    195                                                           variable.name,
    196                                                           period,
    197                                                           ).encode('utf-8'))
    198
-   199   1347780    1479253.0      1.1      0.6          if variable.definition_period not in [periods.MONTH, periods.YEAR]:
+   199   1345881    1405322.0      1.0      0.5          if variable.definition_period not in [periods.MONTH, periods.YEAR]:
    200                                                       raise ValueError(u'Unable to sum constant variable {} over period {} : only variables defined monthly or yearly can be summed over time.'.format(
    201                                                           variable.name,
    202                                                           period).encode('utf-8'))
    203
-   204   1347780     919650.0      0.7      0.4          return np.sum(
-   205   1347780    1528665.0      1.1      0.6              self.calculate(variable_name, sub_period, **parameters)
-   206                                                       for sub_period
-   207   1347780  251382273.0    186.5     96.6              in period.get_subperiods(variable.definition_period))
+   204   1345881     731008.0      0.5      0.3          return sum(
+   205   1345881    1034780.0      0.8      0.4              self.calculate(variable_name, sub_period, **parameters)
+   206   1345881  284142973.0    211.1     97.4              for sub_period in period.get_subperiods(variable.definition_period)
+   207                                                       )
 
-Total time: 108.248 s
+Total time: 106.676 s
 File: /Users/hyperion/Sites/dinsic/openfisca/openfisca-core/openfisca_core/taxscales.py
-Function: calc at line 190
+Function: calc at line 238
 
 Line #      Hits         Time  Per Hit   % Time  Line Contents
 ==============================================================
-   190                                               @profile
-   191                                               def calc(self, base, factor = 1, round_base_decimals = None):
-   192   1133580   18749576.0     16.5     17.3          base1 = np.tile(base, (len(self.thresholds), 1)).T
-   193   1133580    1565085.0      1.4      1.4          if isinstance(factor, (float, int)):
-   194    101179     773392.0      7.6      0.7              factor = np.ones(len(base)) * factor
-   195                                                   # np.finfo(np.float).eps is used to avoid np.nan = 0 * np.inf creation
-   196   1133580   21603438.0     19.1     20.0          thresholds1 = np.outer(factor + np.finfo(np.float).eps, np.array(self.thresholds + [np.inf]))
-   197   1133580     747297.0      0.7      0.7          if round_base_decimals is not None:
-   198   1072039   10762471.0     10.0      9.9              thresholds1 = np.round(thresholds1, round_base_decimals)
-   199   1133580    8503424.0      7.5      7.9          a = max_(min_(base1, thresholds1[:, 1:]) - thresholds1[:, :-1], 0)
-   200   1133580     662089.0      0.6      0.6          if round_base_decimals is None:
-   201     61541     235370.0      3.8      0.2              return np.dot(self.rates, a.T)
-   202                                                   else:
-   203   1072039   21539929.0     20.1     19.9              r = np.tile(self.rates, (len(base), 1))
-   204   1072039    9340383.0      8.7      8.6              b = np.round(a, round_base_decimals)
-   205   1072039   13765234.0     12.8     12.7              return np.add.reduce(np.round(r * b, round_base_decimals), axis=1)
+   238                                               @profile
+   239                                               def calc(self, base, factor = 1, round_base_decimals = None):
+   240   1130636   25436651.0     22.5     23.8          base1 = _T(_tile(base, _shape(self.thresholds)))
+   241   1130623    1523964.0      1.3      1.4          if isinstance(factor, (float, int)):
+   242    101097     757838.0      7.5      0.7              factor = np.ones(len(base)) * factor
+   243                                                   # np.finfo(np.float).eps is used to avoid np.nan = 0 * np.inf creation
+   244   1130623   11182227.0      9.9     10.5          thresholds1 = _threshold1b(factor, _threshold1a(self.thresholds))
+   245   1130623     633155.0      0.6      0.6          if round_base_decimals is not None:
+   246   1069151   12938445.0     12.1     12.1              thresholds1 = _round(thresholds1, round_base_decimals)
+   247   1130623    3711500.0      3.3      3.5          a = _max_min(base1, thresholds1)
+   248   1130623     547379.0      0.5      0.5          if round_base_decimals is None:
+   249     61472     218838.0      3.6      0.2              return np.dot(self.rates, a.T)
+   250                                                   else:
+   251   1069151   23200511.0     21.7     21.7              r = _tile(self.rates, _shape(base))
+   252   1069151   11307583.0     10.6     10.6              b = _round(a, round_base_decimals)
+   253   1069151   15217558.0     14.2     14.3              return _sum(_round(_multiply(r, b), round_base_decimals))
 

@@ -35,7 +35,20 @@ ccallees:
 	python -c "import pstats; p = pstats.Stats('tests.cprof'); p.strip_dirs().sort_stats('tottime').print_callees(5)"
 
 lprofile:
+	pip install line_profiler
 	pip install -e /Users/hyperion/Sites/dinsic/openfisca/openfisca-core
 	kernprof -v -l ./openfisca_france/scripts/performance_tests/test_tests.py
 	python -m line_profiler test_tests.py.lprof > tests.lprof
 	rm test_tests.py.lprof
+
+monkey:
+	pip install MonkeyType
+	pip install -e /Users/hyperion/Sites/dinsic/openfisca/openfisca-core
+	monkeytype run ./openfisca_france/scripts/performance_tests/test_tests.py
+
+numba:
+	brew install llvm@6 --with-toolchain
+	pip install numba==0.38.0
+
+numexpr:
+	pip install numexpr
