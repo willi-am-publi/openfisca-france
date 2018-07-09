@@ -26,7 +26,7 @@ tbs = CountryTaxBenefitSystem()
 
 
 openfisca_france_dir = pkg_resources.get_distribution('OpenFisca-France').location
-yaml_tests_dir = os.path.join(openfisca_france_dir, 'tests')
+yaml_tests_dir = os.path.join(openfisca_france_dir, 'tests', 'formulas', 'cheque_energie')
 
 
 # # Time openfisca-run-test runner
