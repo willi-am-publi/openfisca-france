@@ -26,8 +26,9 @@ class aah_base_ressources(Variable):
             return (1 - 0.8) * tranche1 + (1 - 0.4) * tranche2
 
         def base_ressource_eval_trim():
-            base_ressource_activite_demandeur = famille.demandeur('aah_base_ressources_activite_eval_trimestrielle', period) - famille.demandeur('aah_base_ressources_activite_milieu_ordinaire', period)
-            base_ressource_hors_activite_demandeur = famille.demandeur('aah_base_ressources_hors_activite_eval_trimestrielle', period) + famille.demandeur('aah_base_ressources_activite_milieu_ordinaire', period)
+            three_previous_months = period.first_month.start.period('month', 3).offset(-3)
+            base_ressource_activite_demandeur = famille.demandeur('aah_base_ressources_activite_eval_trimestrielle', period) - famille.demandeur('aah_base_ressources_activite_milieu_protege', three_previous_months, options = [ADD])
+            base_ressource_hors_activite_demandeur = famille.demandeur('aah_base_ressources_hors_activite_eval_trimestrielle', period) + famille.demandeur('aah_base_ressources_activite_milieu_protege', three_previous_months, options = [ADD])
             base_ressource_demandeur = assiette_revenu_activite_demandeur(base_ressource_activite_demandeur) + base_ressource_hors_activite_demandeur
 
             base_ressource_conjoint = famille.conjoint('aah_base_ressources_activite_eval_trimestrielle', period) + famille.conjoint('aah_base_ressources_hors_activite_eval_trimestrielle', period)
@@ -96,15 +97,11 @@ class aah_base_ressources_activite_eval_trimestrielle(Variable):
 
         return (ressources + revenus_tns()) * 4
 
-class aah_base_ressources_activite_milieu_ordinaire(Variable):
+class aah_base_ressources_activite_milieu_protege(Variable):
     value_type = float
-    label = u"Base de ressources hors revenus d'activité de l'AAH pour un individu, évaluation trimestrielle"
+    label = u"Base de ressources de l'AAH des revenus d'activité en milieu protégé pour un individu"
     entity = Individu
     definition_period = MONTH
-
-    def formula(individu, period):
-        return individu('aah_base_ressources_activite_eval_trimestrielle', period)
-
 
 
 class aah_base_ressources_hors_activite_eval_trimestrielle(Variable):
