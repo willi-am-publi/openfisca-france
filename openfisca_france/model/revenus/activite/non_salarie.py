@@ -398,7 +398,6 @@ class nbic_defs(Variable):
     unit = 'currency'
     entity = Individu
     label = u"Locations déjà soumises aux prélèvements sociaux sans CGA (régime du bénéfice réel)"
-    end = '2009-12-31'
     definition_period = YEAR
 
   # (f5km, f5lm, f5mm))
@@ -411,6 +410,7 @@ class nbic_apch(Variable):
     unit = 'currency'
     entity = Individu
     label = u"Artisans pêcheurs : abattement 50% avec CGA ou viseur (régime du bénéfice réel)"
+    end = '2016-12-31'
     definition_period = YEAR
 
   # (f5ks, f5ls, f5ms))
@@ -1151,7 +1151,6 @@ class nlnp_defs(Variable):
     entity = Individu
     label = u"Déficits de locations meublées non professionnelles imposables sans CGA (régime du bénéfice réel)"
     # start_date = date(2009, 1, 1)
-    end = '2010-12-31'
     definition_period = YEAR
 
 
