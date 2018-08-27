@@ -324,26 +324,24 @@ class ppa_forfait_logement(Variable):
         return max_(montant_al, montant_nature)
 
 
-class ppa_fictive(Variable):
-    value_type = float
-    entity = Famille
-    label = u"Prime pour l'activité fictive pour un mois"
-    definition_period = MONTH
+def ppa_fictive(month):
 
-    def formula(famille, period, parameters, mois_demande):
+    def formula(famille, period, parameters):
+        mois_demande = period
+        mois_courant = period.offset(month, 'month')
         forfait_logement = famille('ppa_forfait_logement', mois_demande)
         ppa_majoree_eligibilite = famille('rsa_majore_eligibilite', mois_demande)
 
-        elig = famille('ppa_eligibilite', period, extra_params = [mois_demande])
+        elig = famille('ppa_eligibilite', mois_courant, extra_params = [mois_demande])
         pente = parameters(mois_demande).prestations.minima_sociaux.ppa.pente
         mff_non_majore = famille(
-            'ppa_montant_forfaitaire_familial_non_majore', period, extra_params = [mois_demande])
+            'ppa_montant_forfaitaire_familial_non_majore', mois_courant, extra_params = [mois_demande])
         mff_majore = famille(
-            'ppa_montant_forfaitaire_familial_majore', period, extra_params = [mois_demande])
+            'ppa_montant_forfaitaire_familial_majore', mois_courant, extra_params = [mois_demande])
         montant_forfaitaire_familialise = where(ppa_majoree_eligibilite, mff_majore, mff_non_majore)
-        ppa_base_ressources = famille('ppa_base_ressources', period, extra_params = [mois_demande])
-        ppa_revenu_activite = famille('ppa_revenu_activite', period, extra_params = [mois_demande])
-        bonification_i = famille.members('ppa_bonification', period, extra_params = [mois_demande])
+        ppa_base_ressources = famille('ppa_base_ressources', mois_courant, extra_params = [mois_demande])
+        ppa_revenu_activite = famille('ppa_revenu_activite', mois_courant, extra_params = [mois_demande])
+        bonification_i = famille.members('ppa_bonification', mois_courant, extra_params = [mois_demande])
         bonification = famille.sum(bonification_i)
 
         ppa_montant_base = (
@@ -358,7 +356,35 @@ class ppa_fictive(Variable):
 
         ppa_fictive = ppa_montant_base - max_(ppa_deduction, 0)
         ppa_fictive = max_(ppa_fictive, 0)
+
+
         return elig * ppa_fictive
+
+    return formula
+
+
+class ppa_fictive_m_3(Variable):
+    value_type = float
+    entity = Famille
+    label = u"Prime pour l'activité fictive pour le mois M-3"
+    definition_period = MONTH
+    formula = ppa_fictive(-3)
+
+
+class ppa_fictive_m_2(Variable):
+    value_type = float
+    entity = Famille
+    label = u"Prime pour l'activité fictive pour le mois M-2"
+    definition_period = MONTH
+    formula = ppa_fictive(-2)
+
+
+class ppa_fictive_m_1(Variable):
+    value_type = float
+    entity = Famille
+    label = u"Prime pour l'activité fictive pour le mois M-1"
+    definition_period = MONTH
+    formula = ppa_fictive(-1)
 
 
 class ppa(Variable):
@@ -374,8 +400,12 @@ class ppa(Variable):
         seuil_non_versement = parameters(period).prestations.minima_sociaux.ppa.seuil_non_versement
         # éligibilité étudiants
 
+
         ppa_eligibilite_etudiants = famille('ppa_eligibilite_etudiants', period)
-        ppa = famille('ppa_fictive', period.last_3_months, extra_params = [period], options = [ADD]) / 3
+        ppa = sum([
+            famille('ppa_fictive_m_{}'.format(i), period)
+            for i in range(1,4)
+            ]) / 3
         ppa = ppa * ppa_eligibilite_etudiants * (ppa >= seuil_non_versement)
 
         return ppa
