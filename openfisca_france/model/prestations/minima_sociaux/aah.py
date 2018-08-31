@@ -27,9 +27,10 @@ class aah_base_ressources(Variable):
 
         def base_ressource_eval_trim():
             three_previous_months = period.first_month.start.period('month', 3).offset(-3)
-            base_ressource_activite_demandeur = famille.demandeur('aah_base_ressources_activite_eval_trimestrielle', period) - famille.demandeur('aah_base_ressources_activite_milieu_protege', three_previous_months, options = [ADD])
-            base_ressource_hors_activite_demandeur = famille.demandeur('aah_base_ressources_hors_activite_eval_trimestrielle', period) + famille.demandeur('aah_base_ressources_activite_milieu_protege', three_previous_months, options = [ADD])
-            base_ressource_demandeur = assiette_revenu_activite_demandeur(base_ressource_activite_demandeur) + base_ressource_hors_activite_demandeur
+            milieu_protege_demandeur = 4 * famille.demandeur('aah_base_ressources_activite_milieu_protege', three_previous_months, options = [ADD])
+            base_ressource_activite_demandeur = famille.demandeur('aah_base_ressources_activite_eval_trimestrielle', period) - milieu_protege_demandeur
+            ressource_non_abattue = famille.demandeur('aah_base_ressources_hors_activite_eval_trimestrielle', period) + milieu_protege_demandeur
+            base_ressource_demandeur = assiette_revenu_activite_demandeur(base_ressource_activite_demandeur) + ressource_non_abattue
 
             base_ressource_conjoint = famille.conjoint('aah_base_ressources_activite_eval_trimestrielle', period) + famille.conjoint('aah_base_ressources_hors_activite_eval_trimestrielle', period)
             return base_ressource_demandeur + assiette_conjoint(base_ressource_conjoint)
