@@ -19,4 +19,6 @@ brackets:
       value: 500000.0
 description: Contribution exceptionnelle sur les hauts revenus
 reference: openfisca
-unit: currency
+metadata:
+  threshold_unit: currency
+  rate_unit: /1
